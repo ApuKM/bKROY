@@ -23,12 +23,12 @@ export default function AppNavbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-black text-white">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0f0f10] text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         
         {/* লোগো */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-xl font-bold">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A7C6E] text-xl font-bold">
             B
           </div>
           <div>
@@ -38,7 +38,7 @@ export default function AppNavbar() {
         </Link>
 
         {/* নেভিগেশন লিংকসমূহ */}
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center text-sm text gap-8">
           {navLinks.map((item) => {
             const Icon = item.icon;
             return (
@@ -47,7 +47,7 @@ export default function AppNavbar() {
                 href={item.href}
                 className={`flex items-center gap-2 transition ${
                   pathname === item.href
-                    ? "text-blue-500"
+                    ? "text-[#0A7C6E]"
                     : "text-gray-300 hover:text-white"
                 }`}
               >
@@ -61,7 +61,7 @@ export default function AppNavbar() {
         {/* ডানদিকের অ্যাকশন ও ড্রপডাউন */}
         <div className="flex items-center gap-4">
           <Link href="/login">
-            <Button color="primary">Login</Button>
+            <Button size="sm" className="bg-[#0A7C6E] rounded-xl">Login</Button>
           </Link>
 
           <div className="h-6 w-px bg-white/10" />

@@ -18,7 +18,7 @@ export default function Footer() {
 
   return (
     // Dark background to match the Navbar's blackish theme
-    <footer className="bg-black text-gray-200  border-t border-white/10 pt-16 pb-8">
+    <footer className="bg-[#0f0f10] text-gray-200  border-t border-white/10 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
         {/* Top Section: Grid for Main Footer Content */}
@@ -28,8 +28,8 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             {/* Reused Logo from Navbar */}
             <div className="flex gap-2 items-center text-white">
-              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 font-bold text-3xl text-white">
-                G
+              <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-[#0A7C6E] font-bold text-3xl text-white">
+                B
               </div>
               <div className="flex flex-col gap-0">
                 <p className="font-bold text-2xl tracking-tight m-0 leading-none">
@@ -50,19 +50,20 @@ export default function Footer() {
             <h3 className="text-white font-semibold text-lg tracking-wide">Quick Links</h3>
             <ul className="flex flex-col gap-3 text-sm">
               <li>
-                <Link href="/" className="hover:text-blue-500 transition-colors">Home</Link>
+                <Link href="/" className="hover:text-[#0A7C6E] transition-colors">Home</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-blue-500 transition-colors">Products</Link>
+                <Link href="/products" className="hover:text-[#0A7C6E]
+                transition-colors">Products</Link>
               </li>
               <li>
-                <Link href="/categories" className="hover:text-blue-500 transition-colors">Categories</Link>
+                <Link href="/categories" className="hover:text-[#0A7C6E] transition-colors">Categories</Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-blue-500 transition-colors">Dashboard</Link>
+                <Link href="/dashboard" className="hover:text-[#0A7C6E]transition-colors">Dashboard</Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-blue-500 transition-colors">About Us</Link>
+                <Link href="/about" className="hover:text-[#0A7C6E] transition-colors">About Us</Link>
               </li>
             </ul>
           </div>
@@ -72,15 +73,15 @@ export default function Footer() {
             <h3 className="text-white font-semibold text-lg tracking-wide">Contact Us</h3>
             <ul className="flex flex-col gap-4 text-sm">
               <li className="flex gap-3 items-start">
-                <MapPinCheck size={18} className="text-blue-500 shrink-0 mt-0.5" />
+                <MapPinCheck size={18} className="text-[#0A7C6E] shrink-0 mt-0.5" />
                 <span>123 Innovation Drive,<br />Tech City, TC 90210</span>
               </li>
               <li className="flex gap-3 items-center">
-                <PhoneCall size={18} className="text-blue-500 shrink-0" />
+                <PhoneCall size={18} className="text-[#0A7C6E] shrink-0" />
                 <span>+1 (555) 123-4567</span>
               </li>
               <li className="flex gap-3 items-center">
-                <MailIcon size={18} className="text-blue-500 shrink-0" />
+                <MailIcon size={18} className="text-[#0A7C6E] shrink-0" />
                 <span>support@bkroy.com</span>
               </li>
 </ul>

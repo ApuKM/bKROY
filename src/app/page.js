@@ -1,7 +1,9 @@
+import HeroSection from "@/components/homepage/Banner";
+
 export default function Home() {
   return (
     <div>
-      <h1>Hello</h1>
+      <HeroSection />
     </div>
   );
 }
