@@ -42,7 +42,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-screen bg-black text-white overflow-hidden flex flex-col items-center py-16 px-4 font-sans">
+    <section className="relative min-h-screen  bg-black text-white overflow-hidden flex flex-col items-center pt-16  px-4 font-sans">
       {/* --- Top Text Content --- */}
       <div className="flex flex-col items-center z-10 w-full max-w-4xl text-center">
         {/* Badge */}
@@ -56,7 +56,7 @@ export default function HeroSection() {
 
         {/* Headings */}
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-          Buy & Sell Used Items With Ease
+          <span className="text-[#0A7C6E]">Buy & Sell</span> Used Items With Ease
         </h1>
         <p className="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed mb-10">
           Discover great deals on electronics, vehicles, furniture, fashion, and
@@ -64,10 +64,10 @@ export default function HeroSection() {
           a trusted marketplace.
         </p>
 
-        {/* Search Bar */}
-        <form className="w-full max-w-3xl flex flex-col sm:flex-row items-center bg-[#0a0a0a] border border-white/10 rounded-full p-1 shadow-2xl mb-6 ">
-          <div className="flex-1 flex items-center gap-3 px-4 py-2 sm:py-0 w-full">
-            <FiSearch className="text-gray-400 text-xl" />
+        <form className="w-full max-w-3xl flex flex-col sm:flex-row items-center bg-[#0a0a0a] border border-white/10 rounded-2xl sm:rounded-full p-2 shadow-2xl mb-6">
+          {/* ১. Search Input */}
+          <div className="flex-1 flex items-center gap-3 px-4 py-3 sm:py-2 w-full">
+            <FiSearch className="text-gray-400 text-xl shrink-0" />
             <input
               type="text"
               placeholder="Search products, brands, or categories"
@@ -75,10 +75,11 @@ export default function HeroSection() {
             />
           </div>
 
-          <div className="hidden sm:block w-px h-8 bg-white/10"></div>
+          <div className="w-full h-px sm:w-px sm:h-8 bg-white/10 my-1 sm:my-0"></div>
 
-          <div className="flex-1 flex items-center gap-3 px-4 py-2 sm:py-0 w-full">
-            <FiMapPin className="text-gray-400 text-xl" />
+          {/* ৩. Location Input */}
+          <div className="flex-1 flex items-center gap-3 px-4 py-3 sm:py-2 w-full">
+            <FiMapPin className="text-gray-400 text-xl shrink-0" />
             <input
               type="text"
               placeholder="City, Area, or Nearby Location"
@@ -86,11 +87,13 @@ export default function HeroSection() {
             />
           </div>
 
+          {/* ৪. Submit Button */}
           <button
             type="submit"
-            className="w-full sm:w-auto bg-[#0A7C6E] hover:bg-[#08685d] transition-colors p-3 rounded-full flex items-center justify-center mt-2 sm:mt-0"
+            className="w-full sm:w-auto bg-[#0A7C6E] hover:bg-[#08685d] transition-colors p-3 sm:px-5 rounded-xl sm:rounded-full flex items-center justify-center mt-3 sm:mt-0 gap-2 cursor-pointer"
           >
-            <FiSearch className="text-white text-lg" />
+            <FiSearch className="text-white text-lg shrink-0" />
+            <span className="text-white font-medium sm:hidden">Search</span>
           </button>
         </form>
 
@@ -123,7 +126,10 @@ export default function HeroSection() {
               Start Selling
             </Button>
 
-            <Button variant="outline" className="border-white/20 text-[#0A7C6E] hover:text-black">
+            <Button
+              variant="outline"
+              className="border-white/20 text-[#0A7C6E] hover:text-black"
+            >
               Browse Listings
             </Button>
           </div>

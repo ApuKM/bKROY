@@ -2,27 +2,28 @@
 
 import { motion } from "motion/react"
 
-// 1. Container variants to stagger the child animations
-const containerVariants= {
+const containerVariants = {
   hidden: { opacity: 0 },
-  show: {
+  visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15, // Time in seconds between each card appearing
+      staggerChildren: 0.2,
+      delayChildren: 0.2,
     },
   },
 };
 
-// 2. Card variants for the individual slide-up effect
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show: {
+  hidden: {
+    opacity: 0,
+    y: 50,
+  },
+  visible: {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
-      stiffness: 80,
-      damping: 15,
+      duration: 0.6,
+      ease: "easeOut",
     },
   },
 };
@@ -32,7 +33,7 @@ const Statistics = ({ stats }) => {
     <motion.div 
       variants={containerVariants}
       initial="hidden"
-      whileInView="show"
+      whileInView="visible"
       viewport={{ once: true, margin: "-50px" }} // Triggers just as it enters the viewport
       className="relative z-30 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full px-4 -mt-16 md:-mt-38 lg:-mt-46"
     >
