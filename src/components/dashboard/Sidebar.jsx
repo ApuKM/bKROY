@@ -1,4 +1,12 @@
-import { PersonPencil, CreditCard, Gear, Bars } from "@gravity-ui/icons";
+import {
+  PersonPencil,
+  CreditCard,
+  Gear,
+  Bars,
+  Plus,
+  Briefcase,
+  PencilToLine,
+} from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
 import { MdBorderColor } from "react-icons/md";
@@ -42,8 +50,25 @@ export async function Sidebar() {
     },
   ];
 
+  const sellerNavItems = [
+    { icon: Plus, href: "/dashboard/seller/add-product", label: "Add Product" },
+    {
+      icon: Briefcase,
+      href: "/dashboard/seller/my-products",
+      label: "My Products",
+    },
+    {
+      icon: PencilToLine,
+      href: "/dashboard/seller/manage-orders",
+      label: "Manage Orders",
+    },
+    { icon: PersonPencil, href: "/dashboard/seller", label: "Profile" },
+    { icon: Gear, href: "/dashboard/seller/settings", label: "Settings" },
+  ];
+
   const navLinksMap = {
     buyer: buyerNavItems,
+    seller: sellerNavItems,
   };
 
   const roleKey = user?.role === "seller" ? "seller" : "buyer";
@@ -54,7 +79,7 @@ export async function Sidebar() {
       {navItems.map((item) => (
         <Link href={item.href} key={item.label}>
           <button
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all w-full text-zinc-300 hover:bg-zinc-800"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all w-full text-zinc-300 hover:bg-zinc-800 cursor-pointer"
             type="button"
           >
             {/* 3. The icon renders normally with the updated type */}
@@ -68,7 +93,9 @@ export async function Sidebar() {
 
   return (
     <>
-      <div className="hidden lg:border-r border-zinc-800 lg:block lg:h-full">{navContent}</div>
+      <div className="hidden lg:border-r border-zinc-800 lg:block lg:h-full">
+        {navContent}
+      </div>
       <Drawer>
         <Button className={"lg:hidden"} variant="secondary">
           <Bars />

@@ -70,13 +70,13 @@ export default function BuyerDashboardOverview() {
         </Card.Content>
       </Card>
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {stats.map((stat) => {
           const Icon = stat.icon;
 
           return (
             <Card key={stat.id} className="border border-white/10 bg-zinc-950">
-              <Card.Content className="p-6">
+              <Card.Content className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400">{stat.title}</p>
