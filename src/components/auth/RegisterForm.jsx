@@ -105,13 +105,20 @@ const RegisterForm = () => {
       setIsLoading(false);
     }
   };
+
+  const signUpWithGoogle = async () => {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+  };
+
   return (
     <>
       {/* OAuth Button */}
       <Button
         fullWidth
         className="bg-[#111] border-white/10 text-gray-200 hover:bg-[#161616] h-12 rounded-xl text-sm font-medium transition-colors flex items-center"
-        onPress={() => console.log("Google Auth Triggered")}
+        onPress={signUpWithGoogle}
       >
         <FcGoogle className="text-xl" />
         Continue with Google

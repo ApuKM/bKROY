@@ -49,13 +49,19 @@ const LoginForm = () => {
     }
   };
 
+  const signInWithGoogle = async () => {
+  const data = await authClient.signIn.social({
+    provider: "google",
+  });
+};
+
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   return (
     <>
       <Button
         fullWidth
         className="bg-[#111] border-white/10 text-gray-200 hover:bg-[#161616] h-12 rounded-xl text-sm font-medium transition-colors flex items-center"
-        onPress={() => console.log("Google Auth Triggered")}
+        onPress={signInWithGoogle}
       >
         <FcGoogle className="text-xl" />
         Log in with Google
