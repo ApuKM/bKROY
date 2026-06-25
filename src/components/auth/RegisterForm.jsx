@@ -6,6 +6,8 @@ import { TextField } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { FieldError } from "@heroui/react";
 import { Description } from "@heroui/react";
+import { Radio } from "@heroui/react";
+import { RadioGroup } from "@heroui/react";
 import { Label } from "@heroui/react";
 import { Button } from "@heroui/react";
 import Link from "next/link";
@@ -20,9 +22,10 @@ const RegisterForm = () => {
     email: "",
     password: "",
     imageUrl: "",
+    role: "buyer",
   });
   const router = useRouter();
-
+  // console.log(formData)
   // Processing & UI States
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -87,6 +90,7 @@ const RegisterForm = () => {
         email: formData.email,
         password: formData.password,
         image: formData.imageUrl ? formData.imageUrl : undefined,
+        role: formData.role,
       });
       if (authError) {
         setApiError(
@@ -228,6 +232,45 @@ const RegisterForm = () => {
             onChange={handleChange}
           />
         </TextField>
+
+        {/* Radio */}
+        <div className="flex flex-col gap-4">
+          <Label>What are you?</Label>
+          <RadioGroup
+            name="role"
+            orientation="horizontal"
+            value={formData.role}
+            onChange={(value) => {
+              setFormData((prev) => ({
+                ...prev,
+                role: value,
+              }));
+            }}
+          >
+            <Radio value="buyer">
+              <Radio.Content>
+                {/* The clickable area: control + label */}
+                <Radio.Control>
+                  <Radio.Indicator>
+                    <span>✓</span> {/* Custom indicator (optional) */}
+                  </Radio.Indicator>
+                </Radio.Control>
+                Buyer
+              </Radio.Content>
+            </Radio>
+            <Radio value="seller">
+              <Radio.Content>
+                {/* The clickable area: control + label */}
+                <Radio.Control>
+                  <Radio.Indicator>
+                    <span>✓</span> {/* Custom indicator (optional) */}
+                  </Radio.Indicator>
+                </Radio.Control>
+                Seller
+              </Radio.Content>
+            </Radio>
+          </RadioGroup>
+        </div>
 
         {/* Global Form Error */}
         {apiError && (

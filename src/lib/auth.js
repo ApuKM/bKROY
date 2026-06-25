@@ -7,7 +7,6 @@ const db = client.db("bkroy_db");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
   emailAndPassword: {
@@ -17,6 +16,33 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        defaultValue: "buyer",
+        input: true, 
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Because input is true, user.role now contains what the frontend sent.
+          // SECURITY CHECK: We sanitize it here to prevent a hacker from sending "admin"
+          
+          if (user.role === "seller") {
+            user.role = "seller";
+          } else {
+            // If they sent "buyer", "admin", "supergod", or left it empty -> force "buyer"
+            user.role = "buyer"; 
+          }
+          
+          return user;
+        },
+      },
     },
   },
 });

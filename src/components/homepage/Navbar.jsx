@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Dropdown, Button, Label, Separator, Avatar } from "@heroui/react";
 import { Home, Package, Layers, LayoutDashboard } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { Spinner } from "@heroui/react";
 
 export default function AppNavbar() {
   const pathname = usePathname();
@@ -66,7 +67,9 @@ export default function AppNavbar() {
 
         {/* ডানদিকের অ্যাকশন ও ড্রপডাউন */}
         <div className="flex items-center gap-4">
-          {user ? (
+          {isPending ? (
+            <Spinner color="current" className="justify-end" />
+          ) : user ? (
             <p className="text-xs font-bold text-[#0A7C6E]">
               Hello, {user?.name?.toUpperCase()?.split(" ")[0]}
             </p>
