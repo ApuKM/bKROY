@@ -100,7 +100,7 @@ export default function TrustedSellers() {
           <div className="mb-4 inline-flex items-center rounded-full border border-[#0A7C6E]/20 bg-[#0A7C6E]/10 px-4 py-1.5 text-sm font-medium text-[#0A7C6E]">
             Trusted Sellers{" "}
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white md:text-5xl">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white ">
             Meet Our Top-Rated Sellers
           </h2>
           <p className="mt-4 text-gray-400">

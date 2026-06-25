@@ -13,6 +13,8 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
 const LoginForm = () => {
      const {
@@ -21,13 +23,27 @@ const LoginForm = () => {
     formState: { errors, isSubmitting },
     setError,
   } = useForm();
+  const router = useRouter()
 
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("React Hook Form successfully extracted:", data);
+      const { data: authData, error: authError } =
+        await authClient.signIn.email({
+          email: data.email,
+          password: data.password,
+          callbackURL: "/",
+        });
+      if (authError) {
+        setError("root", {
+          message:
+            authError.message || "Failed to create account. Please try again.",
+        });
+        return;
+      }
+      console.log("Login succesful:", data);
+      router.push("/")
     } catch (err) {
       setError("root", { message: "Network error. Please try again later." });
     }
@@ -118,7 +134,7 @@ const LoginForm = () => {
 
         {errors.root && (
           <p className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg mt-2">
-            {errors.root.message}
+            {errors?.root?.message}
           </p>
         )}
 

@@ -1,5 +1,6 @@
-"use client"
+"use client";
 
+import { authClient } from "@/lib/auth-client";
 import { Separator } from "@heroui/react";
 import { TextField } from "@heroui/react";
 import { Input } from "@heroui/react";
@@ -8,6 +9,7 @@ import { Description } from "@heroui/react";
 import { Label } from "@heroui/react";
 import { Button } from "@heroui/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -19,11 +21,12 @@ const RegisterForm = () => {
     password: "",
     imageUrl: "",
   });
+  const router = useRouter();
 
   // Processing & UI States
   const [showPassword, setShowPassword] = useState(false);
-  const [apiError, setApiError] = useState ("");
-  const [isLoading, setIsLoading] = useState (false);
+  const [apiError, setApiError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // --- Real-time Validation Logic ---
   // Using derived state ensures validation is always perfectly in sync with input values.
@@ -79,9 +82,20 @@ const RegisterForm = () => {
 
     try {
       setIsLoading(true);
-      // Simulating network latency
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("Form Data successfully processed:", formData);
+      const { data, error: authError } = await authClient.signUp.email({
+        name: formData.username,
+        email: formData.email,
+        password: formData.password,
+        image: formData.imageUrl ? formData.imageUrl : undefined,
+      });
+      if (authError) {
+        setApiError(
+          authError.message || "Failed to create account. Please try again.",
+        );
+        return;
+      }
+      console.log("Account successfully created:", data);
+      router.push("/");
       // Proceed to routing or success state here
     } catch (err) {
       setApiError(

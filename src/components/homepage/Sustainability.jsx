@@ -198,7 +198,7 @@ export default function SustainabilityImpactSection() {
                     key={point.id}
                     whileHover={{ x: 4 }}
                     transition={{ duration: 0.2 }}
-                    className="flex gap-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4"
+                    className="flex gap-4 rounded-2xl border border-white/5 bg-white/0.03 p-4"
                   >
                     <div className="mt-0.5 flex size-11 items-center justify-center rounded-xl bg-[#0A7C6E]/10">
                       {point.icon}
