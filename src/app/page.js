@@ -1,6 +1,7 @@
 import HeroSection from "@/components/homepage/Banner";
 import SuccessStories from "@/components/homepage/SuccessfulStrories";
 import SustainabilityImpactSection from "@/components/homepage/Sustainability";
+import TrustedSellers from "@/components/homepage/TrustateSellers";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       <HeroSection />
       <SuccessStories />
       <SustainabilityImpactSection />
+      <TrustedSellers />
     </div>
   );
 }
