@@ -13,11 +13,18 @@ export default function AppNavbar() {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
+  const dashboardHref =
+  user?.role === "buyer"
+    ? "/dashboard/buyer"
+    : user?.role === "seller"
+    ? "/dashboard/seller"
+    : "/dashboard/admin";
+
   const navLinks = [
     { name: "Home", href: "/", icon: Home },
     { name: "Products", href: "/products", icon: Package },
     { name: "Categories", href: "/categories", icon: Layers },
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", href: dashboardHref, icon: Label},
   ];
 
   const handleLogOut = async () => {
