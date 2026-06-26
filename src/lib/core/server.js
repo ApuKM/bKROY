@@ -10,7 +10,6 @@ export const serverFetch = async (path) => {
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
   }
-
   return res.json();
 };
 

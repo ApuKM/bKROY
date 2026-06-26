@@ -6,7 +6,7 @@ import { Suspense } from "react";
 export default async function JobsPage() {
     
   const products = await getProducts();
-    console.log(products)
+    // console.log(products)
   return (
     <div className="min-h-screen bg-[#09090b] ">
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 py-18 ">
