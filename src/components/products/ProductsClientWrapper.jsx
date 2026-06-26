@@ -1,12 +1,52 @@
-import React from "react";
+"use client";
+
+import React, { useMemo, useState } from "react";
 import ProductFilterBar from "./ProductsFilter";
 import ProductCard from "./ProductCard";
 
-export default function ProductsClientWrapper({ products }) {
+export default function ProductsClientWrapper({ initialProducts }) {
+  const [filters, setFilters] = useState({
+    searchQuery: "",
+    category: "All",
+    sort: "latest",
+  });
+  // 2. Handle state updates from the filter bar
+  const handleFilterChange = (newFilters) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
+
+  const products = useMemo(() => {
+    const filtered = initialProducts.filter((product) => {
+      const search = filters.searchQuery.toLowerCase();
+
+      const matchesSearch = product.title.toLowerCase().includes(search);
+
+      const matchesCategory =
+        filters.category === "All" || product.category === filters.category;
+
+      return matchesSearch && matchesCategory;
+    });
+
+    const sorted = [...filtered].sort((a, b) => {
+      switch (filters.sort) {
+        case "price_asc":
+          return a.price - b.price;
+
+        case "price_desc":
+          return b.price - a.price;
+
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [initialProducts, filters]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 pb-12">
       {/* Renders your marketplace search and filter inputs */}
-      <ProductFilterBar />
+      <ProductFilterBar filters={filters} onFilterChange={handleFilterChange}/>
 
       {products?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">

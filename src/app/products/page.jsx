@@ -27,7 +27,7 @@ export default async function JobsPage() {
             </div>
           }
         >
-          <ProductsClientWrapper products={products}/>
+          <ProductsClientWrapper initialProducts={products}/>
         </Suspense>
       </main>
     </div>
