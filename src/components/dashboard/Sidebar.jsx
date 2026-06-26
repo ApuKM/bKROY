@@ -75,7 +75,7 @@ export async function Sidebar() {
   const navItems = navLinksMap[roleKey];
 
   const navContent = (
-    <nav className="flex flex-col gap-1">
+    <nav className="flex flex-col gap-1 ">
       {navItems.map((item) => (
         <Link href={item.href} key={item.label}>
           <button
@@ -99,7 +99,6 @@ export async function Sidebar() {
       <Drawer>
         <Button className={"lg:hidden"} variant="secondary">
           <Bars />
-          Sidebar
         </Button>
         <Drawer.Backdrop>
           <Drawer.Content placement="left">

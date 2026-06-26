@@ -9,8 +9,11 @@ import {
   TextArea,
   TextField,
   Input,
+  toast,
 } from "@heroui/react";
 import { FiImage, FiFileText } from "react-icons/fi";
+import Image from "next/image";
+import { useForm, Controller } from "react-hook-form";
 
 const inputBaseStyles =
   "w-full bg-zinc-900 border border-zinc-800 text-sm text-zinc-100 rounded-lg px-3 py-2.5 placeholder:text-zinc-500 transition-all duration-200 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus:border-[#0A7C6E]";
@@ -18,21 +21,76 @@ const selectTriggerStyles =
   "w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-100 transition-all duration-200 focus:outline-none focus:ring-0";
 
 export default function AddProductForm() {
-  const [fileName, setFileName] = useState("");
-  const [preview, setPreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Destructured react-hook-form methods
+  const { register, handleSubmit, control, reset } = useForm();
+
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
-    if (file) {
-      setFileName(file.name);
-      setPreview(URL.createObjectURL(file));
+  const uploadImageToImgBB = async (file) => {
+    const apiKey = process.env.NEXT_PUBLIC_IMAGE_API;
+    if (!apiKey) {
+      throw new Error("ImgBB API key missing");
+    }
+    const formData = new FormData();
+    formData.append("image", file);
+    const response = await fetch(
+      `https://api.imgbb.com/1/upload?key=${apiKey}`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error("ImgBB upload failed");
+    }
+    return result.data.display_url;
+  };
+
+  const onSubmit = async (data) => {
+    console.log("Clicked");
+    try {
+      setIsSubmitting(true);
+      let imageUrl = "";
+
+      if (selectedFile) {
+        imageUrl = await uploadImageToImgBB(selectedFile);
+      }
+
+      // Combine form data with the uploaded image URL
+      const payload = {
+        ...data,
+        image: imageUrl,
+      };
+
+      console.log("Form Payload:", payload);
+      // await createProduct(payload);
+
+      toast.success("Product created successfully");
+      reset(); // Reset form fields on success
+      setSelectedFile(null);
+      setImagePreview(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create product");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+    <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
       {/* Media Section */}
       <div className="bg-[#18181b] border border-zinc-800 rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-zinc-800/50">
@@ -43,21 +101,31 @@ export default function AddProductForm() {
             htmlFor="product-image"
             className="border-2 border-dashed border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group"
           >
-            <div className="p-4 bg-zinc-800 rounded-full mb-4 group-hover:bg-zinc-700 transition-colors">
-              <FiImage className="text-2xl text-zinc-400 group-hover:text-zinc-300" />
-            </div>
+            {imagePreview ? (
+              <Image
+                src={imagePreview}
+                alt="Preview"
+                width={60}
+                height={40}
+                className="w-60 h-40 rounded-lg object-cover"
+              />
+            ) : (
+              <>
+                <div className="p-4 bg-zinc-800 rounded-full mb-4 group-hover:bg-zinc-700 transition-colors">
+                  <FiImage className="text-2xl text-zinc-400 group-hover:text-zinc-300" />
+                </div>
 
-            <p className="text-sm font-medium text-white mb-1">
-              Click to upload or drag and drop
-            </p>
+                <p className="text-sm font-medium text-white mb-1">
+                  Click to upload or drag and drop
+                </p>
 
-            <p className="text-xs text-zinc-500">
-              SVG, PNG, JPG or GIF (max. 800x400px)
-            </p>
+                <p className="text-xs text-zinc-500">SVG, PNG, JPG or GIF</p>
+              </>
+            )}
 
-            {fileName && (
+            {selectedFile && (
               <p className="mt-3 text-sm text-emerald-400">
-                Selected: {fileName}
+                {selectedFile.name}
               </p>
             )}
           </label>
@@ -86,6 +154,7 @@ export default function AddProductForm() {
               Product Title
             </Label>
             <Input
+              {...register("title", { required: true })}
               className={inputBaseStyles}
               type="text"
               placeholder="e.g. Vintage Leather Jacket"
@@ -94,83 +163,114 @@ export default function AddProductForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Category */}
-            <Select className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-zinc-300">
-                Category
-              </Label>
+            <Controller
+              name="category"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Select
+                  className="flex flex-col gap-1.5"
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  isRequired
+                >
+                  <Label className="text-sm font-medium text-zinc-300">
+                    Category
+                  </Label>
 
-              <Select.Trigger className={selectTriggerStyles}>
-                <Select.Value placeholder="Select category" />
-              </Select.Trigger>
+                  <Select.Trigger className={selectTriggerStyles}>
+                    <Select.Value placeholder="Select category" />
+                  </Select.Trigger>
 
-              <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl">
-                <ListBox className="p-1">
-                  <ListBox.Item
-                    id="electronics"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Electronics
-                  </ListBox.Item>
+                  <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl">
+                    <ListBox className="p-1">
+                      <ListBox.Item
+                        id="electronics"
+                        textValue="Electronics"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Electronics
+                      </ListBox.Item>
 
-                  <ListBox.Item
-                    id="clothing"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Clothing & Apparel
-                  </ListBox.Item>
+                      <ListBox.Item
+                        id="clothing"
+                        textValue="Clothing & Apparel"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Clothing & Apparel
+                      </ListBox.Item>
 
-                  <ListBox.Item
-                    id="home"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Home & Garden
-                  </ListBox.Item>
+                      <ListBox.Item
+                        id="home"
+                        textValue="Home & Garden"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Home & Garden
+                      </ListBox.Item>
 
-                  <ListBox.Item
-                    id="sports"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Sports & Outdoors
-                  </ListBox.Item>
-                </ListBox>
-              </Select.Popover>
-            </Select>
+                      <ListBox.Item
+                        id="sports"
+                        textValue="Sports & Outdoors"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Sports & Outdoors
+                      </ListBox.Item>
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+              )}
+            />
 
             {/* Condition */}
-            <Select className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-zinc-300">
-                Condition
-              </Label>
+            <Controller
+              name="condition"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Select
+                  className="flex flex-col gap-1.5"
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  isRequired
+                >
+                  <Label className="text-sm font-medium text-zinc-300">
+                    Condition
+                  </Label>
 
-              <Select.Trigger className={selectTriggerStyles}>
-                <Select.Value placeholder="Select condition" />
-              </Select.Trigger>
+                  <Select.Trigger className={selectTriggerStyles}>
+                    <Select.Value placeholder="Select condition" />
+                  </Select.Trigger>
 
-              <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl">
-                <ListBox className="p-1">
-                  <ListBox.Item
-                    id="like-new"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Like New
-                  </ListBox.Item>
+                  <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl">
+                    <ListBox className="p-1">
+                      <ListBox.Item
+                        id="like-new"
+                        textValue="Like New"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Like New
+                      </ListBox.Item>
 
-                  <ListBox.Item
-                    id="refurbished"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Refurbished
-                  </ListBox.Item>
+                      <ListBox.Item
+                        id="refurbished"
+                        textValue="Refurbished"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Refurbished
+                      </ListBox.Item>
 
-                  <ListBox.Item
-                    id="used"
-                    className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
-                  >
-                    Used
-                  </ListBox.Item>
-                </ListBox>
-              </Select.Popover>
-            </Select>
+                      <ListBox.Item
+                        id="used"
+                        textValue="Used"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Used
+                      </ListBox.Item>
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="border-t border-zinc-800 my-2"></div>
@@ -180,8 +280,10 @@ export default function AddProductForm() {
             <TextField className="flex flex-col gap-1.5">
               <Label className="text-sm font-medium text-zinc-300">Price</Label>
               <Input
+                {...register("price", { required: true, valueAsNumber: true })}
                 className={inputBaseStyles}
                 type="number"
+                step="0.01"
                 placeholder="0.00"
               />
             </TextField>
@@ -192,6 +294,10 @@ export default function AddProductForm() {
                 Stock Quantity
               </Label>
               <Input
+                {...register("stockQuantity", {
+                  required: true,
+                  valueAsNumber: true,
+                })}
                 className={inputBaseStyles}
                 type="number"
                 placeholder="e.g. 50"
@@ -216,6 +322,7 @@ export default function AddProductForm() {
               Detailed Description
             </Label>
             <TextArea
+              {...register("description", { required: true })}
               className={inputBaseStyles}
               id="product-description"
               placeholder="Describe your product's features, specifications, and what makes it special..."
@@ -227,11 +334,23 @@ export default function AddProductForm() {
 
       {/* Form Actions */}
       <div className="flex items-center justify-end gap-4 pt-4">
-        <Button className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 px-5 rounded-md">
+        <Button
+          type="button"
+          onClick={() => {
+            reset();
+            setSelectedFile(null);
+            setImagePreview(null);
+          }}
+          className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 px-5 rounded-md"
+        >
           Cancel
         </Button>
-        <Button className="bg-[#0A7C6E] text-white hover:bg-[#0A7C6E]/90 font-semibold min-w-[120px] rounded-md shadow-[0_0_20px_rgba(91,94,245,0.2)] hover:shadow-[0_0_28px_rgba(91,94,245,0.4)] transition-all duration-200">
-          Create Product
+        <Button
+          type="submit"
+          isDisabled={isSubmitting}
+          className="bg-[#0A7C6E] text-white hover:bg-[#0A7C6E]/90 font-semibold min-w-[120px] rounded-md shadow-[0_0_20px_rgba(91,94,245,0.2)] hover:shadow-[0_0_28px_rgba(91,94,245,0.4)] transition-all duration-200"
+        >
+          {isSubmitting ? "Creating..." : "Create Product"}
         </Button>
       </div>
     </form>
