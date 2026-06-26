@@ -21,8 +21,8 @@ const selectTriggerStyles =
   "w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-100 transition-all duration-200 focus:outline-none focus:ring-0";
 
 export default function AddProductForm() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Destructured react-hook-form methods
@@ -31,10 +31,10 @@ export default function AddProductForm() {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSelectedFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles((prev) => [...prev, ...files]);
+    const previews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...previews]);
   };
 
   const uploadImageToImgBB = async (file) => {
@@ -59,19 +59,19 @@ export default function AddProductForm() {
   };
 
   const onSubmit = async (data) => {
-    console.log("Clicked");
+    // console.log("Clicked");
     try {
       setIsSubmitting(true);
-      let imageUrl = "";
+      let imageUrls = "";
 
-      if (selectedFile) {
-        imageUrl = await uploadImageToImgBB(selectedFile);
+      if (selectedFiles) {
+        imageUrls = await Promise.all(selectedFiles.map(uploadImageToImgBB));
       }
 
       // Combine form data with the uploaded image URL
       const payload = {
         ...data,
-        image: imageUrl,
+        image: imageUrls,
       };
 
       console.log("Form Payload:", payload);
@@ -79,8 +79,8 @@ export default function AddProductForm() {
 
       toast.success("Product created successfully");
       reset(); // Reset form fields on success
-      setSelectedFile(null);
-      setImagePreview(null);
+      setSelectedFiles(null);
+      setImagePreviews(null);
     } catch (error) {
       console.error(error);
       toast.error("Failed to create product");
@@ -101,14 +101,12 @@ export default function AddProductForm() {
             htmlFor="product-image"
             className="border-2 border-dashed border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group"
           >
-            {imagePreview ? (
-              <Image
-                src={imagePreview}
-                alt="Preview"
-                width={60}
-                height={40}
-                className="w-60 h-40 rounded-lg object-cover"
-              />
+            {imagePreviews.length !== 0 ? (
+              <div className="grid grid-cols-4 gap-3">
+                {imagePreviews.map((src) => (
+                  <Image key={src} src={src} width={120} height={120} alt="" />
+                ))}
+              </div>
             ) : (
               <>
                 <div className="p-4 bg-zinc-800 rounded-full mb-4 group-hover:bg-zinc-700 transition-colors">
@@ -123,16 +121,18 @@ export default function AddProductForm() {
               </>
             )}
 
-            {selectedFile && (
-              <p className="mt-3 text-sm text-emerald-400">
-                {selectedFile.name}
-              </p>
-            )}
+            {selectedFiles &&
+              selectedFiles.map((file) => (
+                <p key={file.index} className="mt-3 text-sm text-emerald-400">
+                  {file.name}
+                </p>
+              ))}
           </label>
 
           <input
             ref={fileInputRef}
             id="product-image"
+            multiple
             type="file"
             accept="image/png,image/jpeg,image/jpg,image/gif,image/svg+xml"
             className="hidden"

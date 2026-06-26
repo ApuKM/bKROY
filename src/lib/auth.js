@@ -22,7 +22,15 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         defaultValue: "buyer",
-        input: true, 
+        input: true,
+      },
+      phone: {
+        type: "string",
+        required: false,
+      },
+      location: {
+        type: "string",
+        required: false,
       },
     },
   },
@@ -32,14 +40,14 @@ export const auth = betterAuth({
         before: async (user) => {
           // Because input is true, user.role now contains what the frontend sent.
           // SECURITY CHECK: We sanitize it here to prevent a hacker from sending "admin"
-          
+
           if (user.role === "seller") {
             user.role = "seller";
           } else {
             // If they sent "buyer", "admin", "supergod", or left it empty -> force "buyer"
-            user.role = "buyer"; 
+            user.role = "buyer";
           }
-          
+
           return user;
         },
       },

@@ -96,13 +96,13 @@ export async function Sidebar() {
       <div className="hidden lg:border-r border-zinc-800 lg:block lg:h-full">
         {navContent}
       </div>
-      <Drawer>
-        <Button className={"lg:hidden"} variant="secondary">
+      <Drawer >
+        <Button className={"lg:hidden bg-zinc-800 text-zinc-300"} variant="tertiary">
           <Bars />
         </Button>
-        <Drawer.Backdrop>
+        <Drawer.Backdrop variant="blur">
           <Drawer.Content placement="left">
-            <Drawer.Dialog>
+            <Drawer.Dialog className="bg-black/80">
               <Drawer.CloseTrigger />
               <Drawer.Header>
                 <Drawer.Heading>Navigation</Drawer.Heading>

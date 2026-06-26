@@ -22,6 +22,8 @@ const RegisterForm = () => {
     email: "",
     password: "",
     imageUrl: "",
+    phone: "",
+    location: "",
     role: "buyer",
   });
   const router = useRouter();
@@ -58,6 +60,15 @@ const RegisterForm = () => {
     return !(hasMinLength && hasUpperCase && hasLowerCase && hasSpecialChar);
   }, [formData.password]);
 
+  const isPhoneInvalid = React.useMemo(() => {
+    const phoneRegex = /^(\+8801[3-9]\d{8}|01[3-9]\d{8})$/;
+    formData.phone.length > 0 && !phoneRegex.test(formData.phone);
+  }, [formData.phone]);
+
+  const isLocationInvalid = React.useMemo(() => {
+    formData.location.trim().length > 0 && formData.location.trim().length < 3;
+  }, [formData.location]);
+
   // General handler for all inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,6 +101,8 @@ const RegisterForm = () => {
         email: formData.email,
         password: formData.password,
         image: formData.imageUrl ? formData.imageUrl : undefined,
+        phone: formData.phone,
+        location: formData.location,
         role: formData.role,
       });
       if (authError) {
@@ -231,6 +244,51 @@ const RegisterForm = () => {
             value={formData.imageUrl}
             onChange={handleChange}
           />
+        </TextField>
+
+        {/* Phone Number Field */}
+        <TextField isRequired fullWidth isInvalid={isPhoneInvalid} name="phone">
+          <Label>Phone Number</Label>
+
+          <Input
+            name="phone"
+            type="tel"
+            maxLength={14}
+            inputMode="numeric"
+            placeholder="+8801XXXXXXXXX"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+
+          {isPhoneInvalid && (
+            <FieldError className="text-red-500 text-xs mt-1">
+              Please enter a valid phone number.
+            </FieldError>
+          )}
+        </TextField>
+
+        {/* Location Field */}
+        <TextField
+          isRequired
+          fullWidth
+          isInvalid={isLocationInvalid}
+          name="location"
+        >
+          <Label>Location</Label>
+
+          <Input
+            name="location"
+            type="text"
+            placeholder="e.g. Dhaka, Bangladesh"
+            value={formData.location}
+            onChange={handleChange}
+          />
+
+          {isLocationInvalid && (
+            <FieldError className="text-red-500 text-xs mt-1">
+              Please enter your location.
+            </FieldError>
+          )}
         </TextField>
 
         {/* Radio */}
