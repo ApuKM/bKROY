@@ -1,7 +1,9 @@
 import { FiShoppingBag } from "react-icons/fi";
 import AddProductForm from "./AddProductForm";
+import { getUserSession } from "@/lib/core/session";
 
 const PostJobPage = async () => {
+  const user = await getUserSession();
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 p-6 md:p-12 flex justify-center">
       <div className="w-full max-w-4xl">
@@ -33,7 +35,7 @@ const PostJobPage = async () => {
         </div>
 
         {/* Main Form */}
-        <AddProductForm />
+        <AddProductForm user={user}/>
       </div>
     </div>
   );

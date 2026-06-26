@@ -12,7 +12,7 @@ import Link from "next/link";
 import { MdBorderColor } from "react-icons/md";
 import { SiWish } from "react-icons/si";
 import { BadgeCent } from "lucide-react";
-import { getUserSession } from "@/lib/sessions/session";
+import { getUserSession } from "@/lib/core/session";
 
 export async function Sidebar() {
   const user = await getUserSession();

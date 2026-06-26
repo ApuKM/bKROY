@@ -14,21 +14,22 @@ import {
 import { FiImage, FiFileText } from "react-icons/fi";
 import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
+import { createProduct } from "@/lib/actions/product";
+import {  useRouter } from "next/navigation";
 
 const inputBaseStyles =
   "w-full bg-zinc-900 border border-zinc-800 text-sm text-zinc-100 rounded-lg px-3 py-2.5 placeholder:text-zinc-500 transition-all duration-200 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus:border-[#0A7C6E]";
 const selectTriggerStyles =
   "w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-100 transition-all duration-200 focus:outline-none focus:ring-0";
 
-export default function AddProductForm() {
+export default function AddProductForm({ user }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Destructured react-hook-form methods
   const { register, handleSubmit, control, reset } = useForm();
-
   const fileInputRef = useRef(null);
+  const router = useRouter();
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
@@ -59,7 +60,6 @@ export default function AddProductForm() {
   };
 
   const onSubmit = async (data) => {
-    // console.log("Clicked");
     try {
       setIsSubmitting(true);
       let imageUrls = "";
@@ -68,22 +68,31 @@ export default function AddProductForm() {
         imageUrls = await Promise.all(selectedFiles.map(uploadImageToImgBB));
       }
 
-      // Combine form data with the uploaded image URL
       const payload = {
         ...data,
         image: imageUrls,
+        sellerInfo: {
+          userId: user?._id,
+          name: user?.name,
+          email: user?.email,
+          phone: user?.phone,
+        },
+        status: "available",
       };
 
       console.log("Form Payload:", payload);
-      // await createProduct(payload);
-
-      toast.success("Product created successfully");
-      reset(); // Reset form fields on success
-      setSelectedFiles(null);
-      setImagePreviews(null);
+      const res = await createProduct(payload);
+      console.log(res)
+      if (res.insertedId) {
+        toast.success("Product created successfully");
+        reset(); // Reset form fields on success
+        setSelectedFiles(null);
+        setImagePreviews(null);
+        router.push("/dashboard/seller");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create product");
+      toast.danger("Failed to create product");
     } finally {
       setIsSubmitting(false);
     }
@@ -101,9 +110,9 @@ export default function AddProductForm() {
             htmlFor="product-image"
             className="border-2 border-dashed border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900 rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group"
           >
-            {imagePreviews.length !== 0 ? (
+            {imagePreviews?.length !== 0 ? (
               <div className="grid grid-cols-4 gap-3">
-                {imagePreviews.map((src) => (
+                {imagePreviews?.map((src) => (
                   <Image key={src} src={src} width={120} height={120} alt="" />
                 ))}
               </div>
