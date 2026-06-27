@@ -3,13 +3,13 @@ import { getUserSession } from "@/lib/core/session";
 import { Button } from "@heroui/react";
 import Link from "next/link";
 import React from "react";
-import MyProductCard from "./MyProductCard";
+import MyProductsWrapper from "./MyProductsWrapper";
 
 const MyProductsPage = async () => {
   const user = await getUserSession();
-  // console.log(user)
-  const products = await getProductsOfSeller(user?.id);
-  // console.log(products);
+  const products = user?.id ? await getProductsOfSeller(user.id) : [];
+  const sellerProducts = Array.isArray(products) ? products : [];
+
   return (
     <div className="max-w-7xl mx-auto bg-black text-white px-4 sm:px-6 ">
       <div className="text-center  mb-8 space-y-5">
@@ -19,7 +19,7 @@ const MyProductsPage = async () => {
         </p>
       </div>
       <div className="">
-        {products?.length === 0 ? (
+        {sellerProducts.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-zinc-800 bg-zinc-900 p-12 text-center shadow-sm">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-400">
               <svg
@@ -54,15 +54,7 @@ const MyProductsPage = async () => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {products.map((product) => (
-              <div
-                key={product._id}
-              >
-                <MyProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          <MyProductsWrapper initialProducts={sellerProducts} />
         )}
       </div>
     </div>

@@ -24,6 +24,7 @@ export const getProductById = async (id) => {
   return serverFetch(`/api/products/${id}`);
 };
 
-export const getProductsOfSeller = async(sellerId) => {
+export const getProductsOfSeller = async (sellerId) => {
+  if (!sellerId) return [];
   return serverFetch(`/api/products/seller/${sellerId}`);
-}
+};
