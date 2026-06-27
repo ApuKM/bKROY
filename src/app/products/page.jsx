@@ -1,24 +1,11 @@
 import ProductsClientWrapper from "@/components/products/ProductsClientWrapper";
+import ProductsSkeleton from "@/components/products/ProductsSkeleton";
 import { getProducts } from "@/lib/api/products";
 import { Spinner } from "@heroui/react";
 import { Suspense } from "react";
 
 export default async function ProductsPage({ searchParams }) {
   const resolvedParams = await searchParams;
-
-  const searchQuery = resolvedParams.searchQuery || "";
-  const category = resolvedParams.category|| "All";
-  const sort = resolvedParams.sort || "latest";
-  const page = parseInt(resolvedParams.page) || 1;
-  const limit = 12;
-
-   const { total, products } = await getProducts({
-    searchQuery,
-    category,
-    sort,
-    page,
-    limit,
-  });
 
   return (
     <div className="min-h-screen bg-[#09090b] ">
@@ -33,16 +20,30 @@ export default async function ProductsPage({ searchParams }) {
           </p>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="flex h-[60vh] items-center justify-center">
-              <Spinner size="lg" />
-            </div>
-          }
-        >
-          <ProductsClientWrapper products={products} total={total}/>
+        <Suspense fallback={<ProductsSkeleton />}>
+          <AsyncProductsList searchParams={resolvedParams} />
         </Suspense>
       </main>
     </div>
   );
+}
+
+// ২. ডাটা ফেচ করার জন্য আলাদা সার্ভার কম্পোনেন্ট
+async function AsyncProductsList({ searchParams }) {
+  const searchQuery = searchParams.searchQuery || "";
+  const category = searchParams.category || "All";
+  const sort = searchParams.sort || "latest";
+  const page = parseInt(searchParams.page) || 1;
+  const limit = 12;
+
+  // এখানে Promise থ্রো হবে, যা উপরের Suspense ক্যাচ করবে
+  const { total, products } = await getProducts({
+    searchQuery,
+    category,
+    sort,
+    page,
+    limit,
+  });
+
+  return <ProductsClientWrapper products={products} total={total} />;
 }
