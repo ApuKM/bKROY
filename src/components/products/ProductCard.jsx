@@ -37,14 +37,14 @@ export default function ProductCard({ product }) {
         <Card.Header className="flex flex-col items-start gap-2 pb-4 p-0">
           <div className="flex flex-col">
             <span className="text-xs font-medium text-zinc-500 mb-1">
-              Sold by: <span className="text-zinc-300">{product?.sellerInfo?.name}</span>
+              Seller: <span className="text-zinc-300">{product?.sellerInfo?.name}</span>
             </span>
             <Card.Title className="text-2xl font-semibold tracking-tight text-white leading-none capitalize">
               {product?.title}
             </Card.Title>
           </div>
 
-          <Card.Description className="text-sm text-zinc-400 leading-relaxed mt-1 line-clamp-2">
+          <Card.Description className="text-sm text-zinc-400 leading-tight mb-2 line-clamp-2">
             {product?.description}
           </Card.Description>
         </Card.Header>

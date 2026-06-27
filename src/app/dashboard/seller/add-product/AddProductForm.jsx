@@ -206,7 +206,7 @@ export default function AddProductForm({ user }) {
                         textValue="Clothing & Apparel"
                         className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
                       >
-                        Clothing & Apparel
+                        Vehicles
                       </ListBox.Item>
 
                       <ListBox.Item
@@ -214,7 +214,7 @@ export default function AddProductForm({ user }) {
                         textValue="Home & Garden"
                         className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
                       >
-                        Home & Garden
+                        Property
                       </ListBox.Item>
 
                       <ListBox.Item
@@ -222,7 +222,14 @@ export default function AddProductForm({ user }) {
                         textValue="Sports & Outdoors"
                         className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
                       >
-                        Sports & Outdoors
+                        Fashion
+                      </ListBox.Item>
+                      <ListBox.Item
+                        id="sports"
+                        textValue="Sports & Outdoors"
+                        className="text-zinc-200 rounded-md px-3 py-2 hover:bg-zinc-800 focus:bg-zinc-800"
+                      >
+                        Home & Living
                       </ListBox.Item>
                     </ListBox>
                   </Select.Popover>

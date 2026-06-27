@@ -3,10 +3,23 @@ import { getProducts } from "@/lib/api/products";
 import { Spinner } from "@heroui/react";
 import { Suspense } from "react";
 
-export default async function JobsPage() {
-    
-  const products = await getProducts();
-    // console.log(products)
+export default async function ProductsPage({ searchParams }) {
+  const resolvedParams = await searchParams;
+
+  const searchQuery = resolvedParams.searchQuery || "";
+  const category = resolvedParams.category|| "All";
+  const sort = resolvedParams.sort || "latest";
+  const page = parseInt(resolvedParams.page) || 1;
+  const limit = 12;
+
+   const { total, products } = await getProducts({
+    searchQuery,
+    category,
+    sort,
+    page,
+    limit,
+  });
+
   return (
     <div className="min-h-screen bg-[#09090b] ">
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 py-18 ">
@@ -27,7 +40,7 @@ export default async function JobsPage() {
             </div>
           }
         >
-          <ProductsClientWrapper initialProducts={products}/>
+          <ProductsClientWrapper products={products} total={total}/>
         </Suspense>
       </main>
     </div>

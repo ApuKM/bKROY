@@ -14,7 +14,6 @@ export default function ProductFilterBar({ filters, onFilterChange }) {
     "Property",
     "Fashion",
     "Home & Living",
-    "Others",
   ];
 
   const sortOptions = [
