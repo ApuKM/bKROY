@@ -16,12 +16,14 @@ export const getProducts = async (filters) => {
   if (filters.limit) params.append("perPage", filters.limit.toString());
 
   const queryString = params.toString();
-
   const url = queryString ? `/api/products?${queryString}` : "/api/products";
-
   return serverFetch(url);
 };
 
 export const getProductById = async (id) => {
   return serverFetch(`/api/products/${id}`);
 };
+
+export const getProductsOfSeller = async(sellerId) => {
+  return serverFetch(`/api/products/seller/${sellerId}`);
+}

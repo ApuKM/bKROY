@@ -72,7 +72,7 @@ export default function AddProductForm({ user }) {
         ...data,
         image: imageUrls,
         sellerInfo: {
-          userId: user?._id,
+          userId: user?.id,
           name: user?.name,
           email: user?.email,
           phone: user?.phone,
