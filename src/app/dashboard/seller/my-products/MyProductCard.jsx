@@ -8,12 +8,15 @@ import {
   Modal,
   Surface,
   TextField,
+  toast,
   useOverlayState,
 } from "@heroui/react";
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
 import { AlertDialog } from "@heroui/react";
+import { updateProduct } from "@/lib/actions/product";
+import { TextArea } from "@heroui/react";
 
 const MyProductCard = ({ product }) => {
   const modalState = useOverlayState({
@@ -24,13 +27,14 @@ const MyProductCard = ({ product }) => {
     title: product.title,
     price: product.price,
     stockQuantity: product.stockQuantity,
-    category: product.category,
+    description: product.description,
   });
-  const handleSave = () => {
-    console.log("Saving new data to API:", formData);
-    // TODO: Add your API PUT/PATCH request here
-
-    // Close modal on success
+  const handleSave = async () => {
+    // console.log("Saving new data to API:", formData);
+    const res = await updateProduct(product._id, formData);
+    if (res.modifiedCount > 0) {
+      toast.success("Product updated succesfully");
+    }
     modalState.close();
   };
 
@@ -209,21 +213,22 @@ const MyProductCard = ({ product }) => {
 
                           <TextField
                             className="w-full"
-                            name="category"
+                            name="description"
                             type="text"
                             variant="secondary"
                           >
                             <Label className=" text-sm text-zinc-300">
-                              Category
+                              Description
                             </Label>
-                            <Input
-                              placeholder="Electronics, Clothing, etc."
+                            <TextArea
+                              rows={5}
+                              placeholder="Tell about this product"
                               className={"bg-zinc-800 text-zinc-300"}
-                              value={formData.category}
+                              value={formData.description}
                               onChange={(e) =>
                                 setFormData({
                                   ...formData,
-                                  category: e.target.value,
+                                  description: e.target.value,
                                 })
                               }
                             />
