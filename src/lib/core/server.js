@@ -1,7 +1,7 @@
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 if (!baseUrl) {
-  throw new Error('NEXT_PUBLIC_API_URL is not defined');
+  throw new Error("NEXT_PUBLIC_API_URL is not defined");
 }
 
 export const serverFetch = async (path) => {
@@ -13,15 +13,18 @@ export const serverFetch = async (path) => {
   return res.json();
 };
 
-export const serverMutation = async (path, data, method="POST") => {
-  const res = await fetch(`${baseUrl}${path}`, {
+export const serverMutation = async ( path, data = null, method = "POST" ) => {
+  const fetchOptions = {
     method: method,
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
-  });
+  };
 
+  if (data) {
+    fetchOptions.body = JSON.stringify(data);
+  }
+  const res = await fetch(`${baseUrl}${path}`, fetchOptions);
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
   }

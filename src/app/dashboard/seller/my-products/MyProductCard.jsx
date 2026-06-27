@@ -15,7 +15,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
 import { AlertDialog } from "@heroui/react";
-import { updateProduct } from "@/lib/actions/product";
+import { deleteProduct, updateProduct } from "@/lib/actions/product";
 import { TextArea } from "@heroui/react";
 
 const MyProductCard = ({ product }) => {
@@ -38,9 +38,13 @@ const MyProductCard = ({ product }) => {
     modalState.close();
   };
 
-  const handleDelete = (id) => {
-    console.log("Deleting product:", id);
-    // TODO: Add your delete API call here
+  const handleDelete = async(id) => {
+    // console.log("Deleting product:", id);
+    const res = await deleteProduct(id)
+    // console.log("res from delete", res)
+    if (res.deletedCount > 0) {
+      toast.success("Product deleted succesfully");
+    }
   };
 
   return (
@@ -70,15 +74,8 @@ const MyProductCard = ({ product }) => {
             </div>
 
             <Chip
-              variant="soft"
-              classNames={{
-                base: product.stockQuantity
-                  ? "bg-[#0A7C6E]/15 border border-[#0A7C6E]/30"
-                  : "bg-red-500/15 border border-red-500/30",
-                content: product.stockQuantity
-                  ? "text-[#30C9B4] font-medium"
-                  : "text-red-400 font-medium",
-              }}
+              variant="secondary"
+
             >
               {product.stockQuantity ? "Available" : "Sold Out"}
             </Chip>

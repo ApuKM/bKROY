@@ -125,9 +125,9 @@ export default function AppNavbar() {
 
                   <Dropdown.Item
                     className="flex items-center px-3 py-2 rounded-lg text-gray-300 cursor-pointer transition-all outline-none hover:bg-neutral-800 hover:text-white data-[hover=true]:bg-neutral-800 data-[hover=true]:text-white"
-                    onPress={() => router.push("/orders")}
+                    onPress={() => router.push(dashboardHref)}
                   >
-                    Orders
+                    Dashboard
                   </Dropdown.Item>
 
                   {/* সেপারেটর লাইন */}
