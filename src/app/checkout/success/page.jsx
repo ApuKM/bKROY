@@ -1,12 +1,17 @@
 import { stripe } from "@/lib/stripe";
 import { serverMutation } from "@/lib/core/server";
 import Link from "next/link";
-import { FiCheckCircle, FiPackage, FiShoppingBag, FiArrowRight } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiPackage,
+  FiShoppingBag,
+  FiArrowRight,
+} from "react-icons/fi";
+import { makeAnOrder } from "@/lib/actions/orders";
 
 export default async function CheckoutSuccessPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
   const sessionId = resolvedSearchParams?.session_id;
-  // console.log("metadata.buyerId:", metadata.buyerId);
 
   if (!sessionId) {
     return (
@@ -14,7 +19,10 @@ export default async function CheckoutSuccessPage({ searchParams }) {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-500">Invalid Session</h1>
           <p className="mt-2 text-zinc-400">No payment session ID provided.</p>
-          <Link href="/" className="mt-4 inline-block text-[#0A7C6E] hover:underline">
+          <Link
+            href="/"
+            className="mt-4 inline-block text-[#0A7C6E] hover:underline"
+          >
             Return Home
           </Link>
         </div>
@@ -30,7 +38,9 @@ export default async function CheckoutSuccessPage({ searchParams }) {
       <div className="flex min-h-screen items-center justify-center bg-[#09090b] text-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-500">Error</h1>
-          <p className="mt-2 text-zinc-400">Failed to retrieve payment details.</p>
+          <p className="mt-2 text-zinc-400">
+            Failed to retrieve payment details.
+          </p>
         </div>
       </div>
     );
@@ -40,8 +50,12 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#09090b] text-white">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-yellow-500">Payment Pending</h1>
-          <p className="mt-2 text-zinc-400">Your payment has not been completed yet.</p>
+          <h1 className="text-2xl font-bold text-yellow-500">
+            Payment Pending
+          </h1>
+          <p className="mt-2 text-zinc-400">
+            Your payment has not been completed yet.
+          </p>
         </div>
       </div>
     );
@@ -53,11 +67,39 @@ export default async function CheckoutSuccessPage({ searchParams }) {
   const transactionId = session.payment_intent;
   const paymentAmount = amount_total / 100;
   const paymentDate = new Date();
-  const buyerId = String(metadata?.buyerId || "").replace(/[}\s]+$/g, "").trim();
+  const buyerId = String(metadata?.buyerId || "")
+    .replace(/[}\s]+$/g, "")
+    .trim();
+  const sellerId = String(metadata?.sellerId || "")
+    .replace(/[}\s]+$/g, "")
+    .trim();
+
+  const orderInfo = {
+    buyerInfo: {
+      userId: buyerId,
+      name: metadata.buyerName,
+      email: session.customer_details?.email,
+    },
+    sellerInfo: {
+      userId: sellerId,
+      name: metadata.sellerName,
+      email: metadata.sellerEmail,
+    },
+    productId: metadata.productId,
+    paymentStatus: "paid",
+    orderStatus: "processing",
+  };
 
   try {
+    const res = await makeAnOrder(orderInfo);
+
+    if (!res.insertedId) {
+      throw new Error("Order creation failed");
+    }
+
     await serverMutation("/api/transactions", {
       transactionId: transactionId,
+      orderId: res.insertedId,  
       buyerId,
       sellerId: metadata.sellerId,
       productId: metadata.productId,
@@ -94,36 +136,56 @@ export default async function CheckoutSuccessPage({ searchParams }) {
           <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-500/10 text-green-500">
             <FiCheckCircle size={48} />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">Payment Successful!</h1>
-          <p className="mb-8 text-zinc-400">Thank you for your purchase. Your order has been processed.</p>
+          <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">
+            Payment Successful!
+          </h1>
+          <p className="mb-8 text-zinc-400">
+            Thank you for your purchase. Your order has been processed.
+          </p>
 
           <div className="mb-8 rounded-2xl border border-zinc-800/50 bg-[#27272a]/30 p-6 text-left">
-            <h2 className="mb-4 text-xl font-bold text-white border-b border-zinc-800/60 pb-3">Order Summary</h2>
+            <h2 className="mb-4 text-xl font-bold text-white border-b border-zinc-800/60 pb-3">
+              Order Summary
+            </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
               <div>
                 <span className="block text-zinc-500">Transaction ID</span>
-                <span className="font-medium text-zinc-300">{transactionId}</span>
+                <span className="font-medium text-zinc-300">
+                  {transactionId}
+                </span>
               </div>
               <div>
                 <span className="block text-zinc-500">Payment Date</span>
-                <span className="font-medium text-zinc-300">{paymentDateFormatted}</span>
+                <span className="font-medium text-zinc-300">
+                  {paymentDateFormatted}
+                </span>
               </div>
               <div>
                 <span className="block text-zinc-500">Amount Paid</span>
-                <span className="font-bold text-[#0A7C6E]">৳ {paymentAmount.toLocaleString()}</span>
+                <span className="font-bold text-[#0A7C6E]">
+                  ৳ {paymentAmount.toLocaleString()}
+                </span>
               </div>
               <div>
                 <span className="block text-zinc-500">Product ID</span>
-                <span className="font-medium text-zinc-300">{metadata.productId}</span>
+                <span className="font-medium text-zinc-300">
+                  {metadata.productId}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href={`/dashboard/buyer/${buyerId}/payment-history`} className="flex items-center justify-center gap-2 rounded-xl bg-[#0A7C6E] py-3 px-6 font-bold text-white transition-all hover:bg-[#08685d]">
+            <Link
+              href={`/dashboard/buyer/${buyerId}/payment-history`}
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#0A7C6E] py-3 px-6 font-bold text-white transition-all hover:bg-[#08685d]"
+            >
               <FiShoppingBag /> View My Orders
             </Link>
-            <Link href="/" className="flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-transparent py-3 px-6 font-bold text-white transition-all hover:bg-zinc-800">
+            <Link
+              href="/"
+              className="flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-transparent py-3 px-6 font-bold text-white transition-all hover:bg-zinc-800"
+            >
               <FiPackage /> Continue Shopping <FiArrowRight />
             </Link>
           </div>

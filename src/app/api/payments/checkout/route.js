@@ -59,6 +59,8 @@ export async function POST(request) {
         productId: productId,
         buyerId: buyerInfo.userId,
         sellerId: sellerInfo.userId,
+        sellerName: sellerInfo.name,
+        sellerEmail: sellerInfo.email,
         buyerName: buyerInfo.name,
         buyerPhone: buyerInfo.phone || "",
         buyerLocation: buyerInfo.location || "",

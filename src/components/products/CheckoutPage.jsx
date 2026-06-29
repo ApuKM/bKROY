@@ -33,7 +33,7 @@ export default function CheckoutPageClient({ buyer, product }) {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     // This is where your buyer's userId is passed alongside the order payload
     const orderPayload = {
       buyerInfo: {
