@@ -18,7 +18,9 @@ export default function AppNavbar() {
     ? "/dashboard/buyer"
     : user?.role === "seller"
     ? "/dashboard/seller"
-    : "/dashboard/admin";
+    : user?.role === "admin"
+    ? "/dashboard/admin"
+    : ""; 
 
   const navLinks = [
     { name: "Home", href: "/", icon: Home },

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
@@ -13,47 +13,47 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 const LoginForm = () => {
-     const {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
   } = useForm();
-  const router = useRouter()
 
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
+    const redirectTo = searchParams.get("redirect") || "/dashboard";
     try {
       const { data: authData, error: authError } =
         await authClient.signIn.email({
           email: data.email,
           password: data.password,
-          callbackURL: "/",
         });
       if (authError) {
         setError("root", {
-          message:
-            authError.message || "Failed to login. Please try again.",
+          message: authError.message || "Failed to login. Please try again.",
         });
         return;
       }
       console.log("Login succesful:", data);
-      router.push("/")
+      router.push(redirectTo);
     } catch (err) {
       setError("root", { message: "Network error. Please try again later." });
     }
   };
 
   const signInWithGoogle = async () => {
-  const data = await authClient.signIn.social({
-    provider: "google",
-  });
-};
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+  };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   return (

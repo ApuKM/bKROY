@@ -5,24 +5,51 @@ import { getProductById } from "@/lib/api/products";
 
 export default async function BuyerOrdersPage() {
   const user = await getUserSession();
-  const orders = await getOrdersOfBuyer(user?.id);
+  
+  let orders = [];
 
-const ordersWithProducts = await Promise.all(
-  orders.map(async (order) => {
-    const product = await getProductById(order.productId);
-    // console.log(product)
+  // 1. Only fetch if we actually have a logged-in user
+  if (user?.id) {
+    try {
+      const response = await getOrdersOfBuyer(user.id);
+      
+      // 2. CRITICAL: Safely verify that the response is actually an array
+      orders = Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error("Failed to fetch buyer orders:", error);
+      orders = []; // Fallback to empty array on network failure
+    }
+  }
 
-    return {
-      ...order,
-      product,
-    };
-  })
-);
+  // 3. Since orders is guaranteed to be an array now, .map() will never crash
+  const ordersWithProducts = await Promise.all(
+    orders.map(async (order) => {
+      try {
+        const product = await getProductById(order.productId);
+        return {
+          ...order,
+          product,
+        };
+      } catch {
+        return {
+          ...order,
+          product: null, // Don't let one broken product crash the whole page
+        };
+      }
+    })
+  );
 
   return (
     <div className="mx-auto max-w-5xl py-8">
       <h1 className="mb-6 text-2xl font-bold text-white px-6">My Orders</h1>
-      <OrderListClient initialOrders={ordersWithProducts} />
+
+      {ordersWithProducts && ordersWithProducts.length > 0 ? (
+        <OrderListClient initialOrders={ordersWithProducts} />
+      ) : (
+        <div className="px-6 py-12 text-center text-gray-400">
+          <p className="text-lg">You dont have any orders yet.</p>
+        </div>
+      )}
     </div>
   );
 }
