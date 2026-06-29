@@ -30,7 +30,7 @@ export async function Sidebar() {
     },
     {
       icon: BadgeCent,
-      href: "/dashboard/buyer/payments",
+      href: `/dashboard/buyer/${user?.id}/payment-history`,
       label: "Payment History",
     },
     {

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import clientPromise from "@/lib/db";
-import { ObjectId } from "mongodb";
+import { serverMutation } from "@/lib/core/server";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -28,58 +27,34 @@ export async function POST(request) {
 
     // Fulfill the purchase...
     try {
-      const client = await clientPromise;
-      const db = client.db("bkroy_db");
-
       // Extract metadata
       const { productId, buyerId, sellerId, buyerName, buyerPhone, buyerLocation } = session.metadata;
-
-      // 1. Create a Transaction record
-      const transaction = {
+      console.log(productId, buyerName)
+      const transactionData = {
         transactionId: session.payment_intent,
         buyerId: buyerId,
         sellerId: sellerId,
         productId: productId,
-        paymentAmount: session.amount_total / 100, // stored in standard currency (e.g., BDT)
+        paymentAmount: session.amount_total / 100,
         paymentStatus: session.payment_status === "paid" ? "Paid" : "Pending",
         paymentMethod: "Stripe",
         paymentDate: new Date(),
         sessionId: session.id,
-      };
-
-      await db.collection("transactions").insertOne(transaction);
-
-      // 2. Create or Update Order
-      const order = {
-        buyerId,
-        sellerId,
-        productId,
+        // Include buyer/order details so the backend can process the full order
         buyerDetails: {
           name: buyerName,
           phone: buyerPhone,
           location: buyerLocation,
           email: session.customer_details?.email,
-        },
-        transactionId: session.payment_intent,
-        totalAmount: session.amount_total / 100,
-        status: "processing", // Order status
-        paymentStatus: session.payment_status === "paid" ? "Paid" : "Pending",
-        createdAt: new Date(),
+        }
       };
 
-      await db.collection("orders").insertOne(order);
+      // Send the transaction data to the Express backend to handle DB storage
+      await serverMutation("/api/transactions", transactionData, "POST");
 
-      // 3. (Optional) Update Product status or stock
-      if (productId) {
-         await db.collection("products").updateOne(
-           { _id: new ObjectId(productId) },
-           { $inc: { stockQuantity: -1 } }
-         );
-      }
-
-    } catch (dbError) {
-      console.error("Database operation failed in webhook:", dbError);
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    } catch (backendError) {
+      console.error("Backend operation failed in webhook:", backendError);
+      return NextResponse.json({ error: "Backend error" }, { status: 500 });
     }
   }
 

@@ -1,11 +1,12 @@
 import { stripe } from "@/lib/stripe";
+import { serverMutation } from "@/lib/core/server";
 import Link from "next/link";
 import { FiCheckCircle, FiPackage, FiShoppingBag, FiArrowRight } from "react-icons/fi";
 
 export default async function CheckoutSuccessPage({ searchParams }) {
-  // Await searchParams in Next.js 15+ if needed, but in 14 it's okay to just destructure. In Next.js 16 it might require await.
   const resolvedSearchParams = await searchParams;
   const sessionId = resolvedSearchParams?.session_id;
+  // console.log("metadata.buyerId:", metadata.buyerId);
 
   if (!sessionId) {
     return (
@@ -46,15 +47,44 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     );
   }
 
+  // --- Payment is confirmed as "paid" by Stripe ---
+  // Save the transaction to the Express backend
   const { metadata, amount_total } = session;
-  const paymentAmount = amount_total / 100; // Convert from cents
   const transactionId = session.payment_intent;
-  const paymentDate = new Date().toLocaleDateString("en-US", {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  const paymentAmount = amount_total / 100;
+  const paymentDate = new Date();
+  const buyerId = String(metadata?.buyerId || "").replace(/[}\s]+$/g, "").trim();
+
+  try {
+    await serverMutation("/api/transactions", {
+      transactionId: transactionId,
+      buyerId,
+      sellerId: metadata.sellerId,
+      productId: metadata.productId,
+      paymentAmount: paymentAmount,
+      paymentStatus: "Paid",
+      paymentMethod: "Stripe",
+      paymentDate: paymentDate.toISOString(),
+      sessionId: session.id,
+      buyerDetails: {
+        name: metadata.buyerName,
+        phone: metadata.buyerPhone,
+        location: metadata.buyerLocation,
+        email: session.customer_details?.email,
+      },
+    });
+  } catch (err) {
+    console.error("Failed to save transaction to backend:", err);
+    // We still show the success page even if backend save fails,
+    // because the payment itself DID succeed on Stripe.
+  }
+
+  const paymentDateFormatted = paymentDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
   return (
@@ -76,7 +106,7 @@ export default async function CheckoutSuccessPage({ searchParams }) {
               </div>
               <div>
                 <span className="block text-zinc-500">Payment Date</span>
-                <span className="font-medium text-zinc-300">{paymentDate}</span>
+                <span className="font-medium text-zinc-300">{paymentDateFormatted}</span>
               </div>
               <div>
                 <span className="block text-zinc-500">Amount Paid</span>
@@ -90,7 +120,7 @@ export default async function CheckoutSuccessPage({ searchParams }) {
           </div>
 
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href={`/dashboard/buyer/payment-history`} className="flex items-center justify-center gap-2 rounded-xl bg-[#0A7C6E] py-3 px-6 font-bold text-white transition-all hover:bg-[#08685d]">
+            <Link href={`/dashboard/buyer/${buyerId}/payment-history`} className="flex items-center justify-center gap-2 rounded-xl bg-[#0A7C6E] py-3 px-6 font-bold text-white transition-all hover:bg-[#08685d]">
               <FiShoppingBag /> View My Orders
             </Link>
             <Link href="/" className="flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-transparent py-3 px-6 font-bold text-white transition-all hover:bg-zinc-800">

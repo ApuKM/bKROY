@@ -27,6 +27,7 @@ export async function POST(request) {
     const unitAmount = Math.round((product.price) * 100); 
     const deliveryAmount = Math.round(120 * 100);
 
+    console.log("buyerInfo.userId:", buyerInfo.userId);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       customer_email: buyerInfo.email,

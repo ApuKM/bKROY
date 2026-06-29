@@ -13,7 +13,7 @@ export const serverFetch = async (path) => {
   return res.json();
 };
 
-export const serverMutation = async ( path, data = null, method = "POST" ) => {
+export const serverMutation = async (path, data = null, method = "POST") => {
   const fetchOptions = {
     method: method,
     headers: {
