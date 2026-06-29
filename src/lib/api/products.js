@@ -20,6 +20,10 @@ export const getProducts = async (filters) => {
   return serverFetch(url);
 };
 
+export const getFeaturedProducts = async () => {
+  return serverFetch(`/api/products/featured`);
+};
+
 export const getProductById = async (id) => {
   return serverFetch(`/api/products/${id}`);
 };
