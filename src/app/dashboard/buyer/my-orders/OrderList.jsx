@@ -5,10 +5,12 @@ import React, { useState } from "react";
 import { Card, Avatar, Button } from "@heroui/react";
 import { Search, MapPin, FileText, XCircle } from "lucide-react";
 import Link from "next/link";
+import { AlertDialog } from "@heroui/react";
+import { deleteAnOrder } from "@/lib/actions/orders";
 
 export default function OrderListClient({ initialOrders }) {
   const [orders, setOrders] = useState(initialOrders);
-    console.log(orders)
+  console.log(orders);
   // Helper function to style status badges dynamically based on your new DB statuses
   const getStatusStyles = (status) => {
     const normalizedStatus = status?.toLowerCase();
@@ -28,13 +30,12 @@ export default function OrderListClient({ initialOrders }) {
 
   // Optimistic UI update for cancellation
   const handleCancelOrder = async (orderId) => {
-    // 1. Update the UI instantly
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order._id === orderId ? { ...order, orderStatus: "cancelled" } : order
-      )
-    );
-
+    console.log("Deleting order:", orderId);
+    const res = await deleteAnOrder(orderId);
+    console.log("res from delete", res)
+    if (res.deletedCount > 0) {
+      toast.success("Order deleted succesfully");
+    }
   };
 
   return (
@@ -43,11 +44,12 @@ export default function OrderListClient({ initialOrders }) {
         {orders.map((item) => {
           // Fallbacks for missing product data in the current schema
           // (Ideally, populate these fields from the database)
-          const productName = item.product?.name || `Product ID: ${item.productId}`;
+          const productName =
+            item.product?.name || `Product ID: ${item.productId}`;
           const productPrice = item.product?.price || "N/A";
           const productImage = item.product?.images?.[0];
-          const orderDate = item.createdAt 
-            ? new Date(item.createdAt).toLocaleDateString() 
+          const orderDate = item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString()
             : "Unknown Date";
 
           return (
@@ -69,7 +71,7 @@ export default function OrderListClient({ initialOrders }) {
                     </h3>
                     <span
                       className={`rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${getStatusStyles(
-                        item.orderStatus
+                        item.orderStatus,
                       )}`}
                     >
                       {item.orderStatus}
@@ -77,10 +79,14 @@ export default function OrderListClient({ initialOrders }) {
                   </div>
 
                   <p className="text-sm text-gray-400">
-                    Seller: <span className="text-gray-300">{item.sellerInfo.name}</span>
+                    Seller:{" "}
+                    <span className="text-gray-300">
+                      {item.sellerInfo.name}
+                    </span>
                   </p>
                   <p className="text-xs text-gray-500">
-                    Order #{item._id.slice(-6).toUpperCase()} • Placed on {orderDate}
+                    Order #{item._id.slice(-6).toUpperCase()} • Placed on{" "}
+                    {orderDate}
                   </p>
                 </div>
               </div>
@@ -94,14 +100,14 @@ export default function OrderListClient({ initialOrders }) {
                 <div className="flex flex-wrap items-center gap-2">
                   {/* View Details Button */}
                   <Link href={`/products/${item.productId}`}>
-                  <Button
-                    variant="bordered"
-                    className="border-white/10 text-white hover:bg-white/5"
-                    size="sm"
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Details
-                  </Button>
+                    <Button
+                      variant="bordered"
+                      className="border-white/10 text-white hover:bg-white/5"
+                      size="sm"
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      Details
+                    </Button>
                   </Link>
 
                   {/* Track Order Button */}
@@ -119,16 +125,49 @@ export default function OrderListClient({ initialOrders }) {
                   </Button>
 
                   {/* Cancel Order Button */}
-                  {(item.orderStatus === "processing" || item.orderStatus === "pending") && (
-                    <Button
-                      variant="light"
-                      className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                      size="sm"
-                      onClick={() => handleCancelOrder(item._id)}
-                    >
-                      <XCircle className="mr-2 h-4 w-4" />
-                      Cancel
-                    </Button>
+                  {(item.orderStatus === "processing" ||
+                    item.orderStatus === "pending") && (
+                    <AlertDialog>
+                      <Button variant="danger-soft" size="sm">
+                        Cancel
+                      </Button>
+
+                      <AlertDialog.Backdrop className="bg-black/70 backdrop-blur-sm">
+                        <AlertDialog.Container>
+                          <AlertDialog.Dialog className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111827] text-white shadow-2xl">
+                            <AlertDialog.CloseTrigger className="text-zinc-400 hover:text-white" />
+
+                            <AlertDialog.Header className="items-center text-center">
+                              <AlertDialog.Icon
+                                status="danger"
+                                className="bg-red-500/15 text-red-400"
+                              />
+
+                              <AlertDialog.Heading className="mt-4 text-xl font-semibold text-white">
+                                Cancel Order?
+                              </AlertDialog.Heading>
+
+                              <p className="mt-2 text-sm leading-6 text-zinc-400">
+                                This action cannot be undone. The order will be
+                                permanently removed from your marketplace.
+                              </p>
+                            </AlertDialog.Header>
+
+                            <AlertDialog.Footer className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
+                              <Button
+                                slot="close"
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleCancelOrder(item._id)}
+                                className="border-white/10 text-zinc-300 hover:bg-white/5"
+                              >
+                                Delete
+                              </Button>
+                            </AlertDialog.Footer>
+                          </AlertDialog.Dialog>
+                        </AlertDialog.Container>
+                      </AlertDialog.Backdrop>
+                    </AlertDialog>
                   )}
                 </div>
               </div>
@@ -136,7 +175,6 @@ export default function OrderListClient({ initialOrders }) {
           );
         })}
       </div>
-
     </Card.Content>
   );
 }
