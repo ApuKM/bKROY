@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Bkroy - Second-Hand Marketplace
 
-## Getting Started
+## Project Purpose
+Bkroy is a robust second-hand product marketplace designed to connect local sellers and buyers seamlessly. It provides a platform where sellers can easily advertise their used goods, and buyers can browse, negotiate, and purchase items safely. The application also includes a comprehensive administration system to monitor user activity, manage listings, and ensure a secure and trustworthy environment for all transactions.
 
-First, run the development server:
+## Live URL
+🔗 https://b-kroy.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Key Features
+* **Role-Based Access Control:** Distinct, secure interfaces and capabilities for Buyers, Sellers, and Admins.
+* **Product Advertisement & Management:** Sellers can easily post ads with images, details, and pricing, while managing their active inventory.
+* **Seamless Checkout & Transactions:** Integrated Stripe payment processing for secure online card payments, alongside options like Cash on Delivery (COD).
+* **Comprehensive Admin Monitoring:** A dedicated admin dashboard to oversee platform activity, manage user accounts, moderate listings, and view key platform metrics.
+* **Interactive Dashboards & Analytics:** Sellers can track ad performance and sales, while buyers can view their payment and order history through intuitive visual charts.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## NPM Packages Used
+Here are the major dependencies and tools used to build this project:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* `next` - React framework for building fast, server-rendered, and static web applications.
+* `react` / `react-dom` - Core libraries for building interactive user interfaces.
+* `stripe` - Payment processing backend integration for handling secure online transactions.
+* `mongodb` - Native MongoDB driver for efficient database connection and data storage.
+* `tailwindcss` - Utility-first CSS framework for rapid, responsive UI development.
+* `react-icons` - Library for easily including popular icon sets (like Feather, Material, etc.) in React components.
+* `better-auth` - Comprehensive and secure authentication framework for managing users, sessions, and role-based access (Admin, Buyer, Seller).
+* `react-hook-form` - Performant, flexible, and extensible form library used for seamless validation on product listings, login, and checkout forms.
+* `recharts` - A composable charting library built on React components, used for visualizing sales data and user activity in the dashboards.
