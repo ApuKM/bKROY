@@ -38,11 +38,7 @@ export async function Sidebar() {
       href: "/dashboard/seeker/profile",
       label: "Profile Management",
     },
-    {
-      icon: CreditCard,
-      href: "/dashboard/buyer/billing",
-      label: "Billing",
-    },
+
     {
       icon: Gear,
       href: "/dashboard/buyer/settings",
@@ -63,6 +59,11 @@ export async function Sidebar() {
       label: "Manage Orders",
     },
     { icon: PersonPencil, href: "/dashboard/seller", label: "Profile" },
+    {
+      icon: CreditCard,
+      href: "/dashboard/buyer/billing",
+      label: "Billing",
+    },
     { icon: Gear, href: "/dashboard/seller/settings", label: "Settings" },
   ];
 
@@ -96,8 +97,11 @@ export async function Sidebar() {
       <div className="hidden lg:border-r border-zinc-800 lg:block lg:h-full">
         {navContent}
       </div>
-      <Drawer >
-        <Button className={"lg:hidden bg-zinc-800 text-zinc-300"} variant="tertiary">
+      <Drawer>
+        <Button
+          className={"lg:hidden bg-zinc-800 text-zinc-300"}
+          variant="tertiary"
+        >
           <Bars />
         </Button>
         <Drawer.Backdrop variant="blur">

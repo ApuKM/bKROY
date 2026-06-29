@@ -20,7 +20,7 @@ export default function CheckoutPageClient({ buyer, product }) {
     email: buyer?.email,
     location: buyer?.location || "",
     phone: buyer?.phone || null,
-    paymentMethod: "bkash", // Default standard payment option
+    paymentMethod: "Stripe Card Payment", // Default standard payment option
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,12 +54,29 @@ export default function CheckoutPageClient({ buyer, product }) {
     };
 
     try {
-      // Replace this log with your actual API route call (e.g., axios.post('/api/orders', orderPayload))
-      console.log("Order Processed Successfully for User ID:", orderPayload);
-      toast.success(`Order placed successfully for : ${product?.name}!`);
+      if (formData.paymentMethod === "Stripe Card Payment") {
+        const response = await fetch("/api/payments/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderPayload),
+        });
+
+        const data = await response.json();
+        
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          toast.error(data.error || "Failed to initialize Stripe checkout.");
+          setIsSubmitting(false);
+        }
+      } else {
+        // Handle COD or other methods if needed
+        toast.success(`Order placed successfully for : ${product?.name}!`);
+        setIsSubmitting(false);
+      }
     } catch (error) {
       console.error("Failed to place order:", error);
-    } finally {
+      toast.error("Something went wrong.");
       setIsSubmitting(false);
     }
   };
@@ -158,16 +175,16 @@ export default function CheckoutPageClient({ buyer, product }) {
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 <label
-                  className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${formData.paymentMethod === "bkash" ? "border-[#0A7C6E] bg-[#0A7C6E]/5" : "border-zinc-800 bg-zinc-900/30"}`}
+                  className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${formData.paymentMethod === "Stripe Card Payment" ? "border-[#0A7C6E] bg-[#0A7C6E]/5" : "border-zinc-800 bg-zinc-900/30"}`}
                 >
                   <span className="font-medium text-sm">
-                    Digital (bKash/Nagad)
+                     Stripe Card Payment
                   </span>
                   <input
                     type="radio"
                     name="paymentMethod"
-                    value="bkash"
-                    checked={formData.paymentMethod === "bkash"}
+                    value="Stripe Card Payment"
+                    checked={formData.paymentMethod === "Stripe Card Payment"}
                     onChange={handleInputChange}
                     className="accent-[#0A7C6E]"
                   />
@@ -234,7 +251,7 @@ export default function CheckoutPageClient({ buyer, product }) {
 
               <div className="my-4 flex justify-between text-base font-bold text-white">
                 <span>Grand Total</span>
-                <span className="text-[#0A7C6E]">৳ {product?.price + 120}</span>
+                <span className="text-[#0A7C6E]">৳ {Number(product?.price) + 120}</span>
               </div>
 
               {/* Submit Button passing user details inside handler */}
