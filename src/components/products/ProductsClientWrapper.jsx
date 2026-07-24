@@ -6,12 +6,13 @@ import ProductCard from "./ProductCard";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PaginationWithSummary } from "./Pagination";
 
-export default function ProductsClientWrapper({ products, total }) {
+export default function ProductsClientWrapper({ products = [], total = 0 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isInitialMount = useRef(true);
 
+  // Initialize state directly from URL search params
   const [filters, setFilters] = useState({
     searchQuery: searchParams.get("searchQuery") || "",
     category: searchParams.get("category") || "All",
@@ -19,6 +20,7 @@ export default function ProductsClientWrapper({ products, total }) {
     page: parseInt(searchParams.get("page") || "1"),
   });
 
+  // Sync state if URL changes externally (e.g. browser back/forward buttons)
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -30,24 +32,15 @@ export default function ProductsClientWrapper({ products, total }) {
     const newSort = searchParams.get("sort") || "latest";
     const newPage = parseInt(searchParams.get("page") || "1");
 
-    setFilters((prev) => {
-      if (
-        prev.searchQuery === newSearchQuery &&
-        prev.category === newCategory &&
-        prev.sort === newSort &&
-        prev.page === newPage
-      ) {
-        return prev;
-      }
-      return {
-        searchQuery: newSearchQuery,
-        category: newCategory,
-        sort: newSort,
-        page: newPage,
-      };
+    setFilters({
+      searchQuery: newSearchQuery,
+      category: newCategory,
+      sort: newSort,
+      page: newPage,
     });
   }, [searchParams]);
-  // 2. Handle state updates from the filter bar
+
+  // Handle state updates from the filter bar
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => {
       const updatedFilters = { ...prev, ...newFilters };
@@ -55,6 +48,7 @@ export default function ProductsClientWrapper({ products, total }) {
         (key) => key !== "page"
       );
 
+      // Reset to page 1 whenever any filter other than page changes
       if (changedFilterKeys.length > 0) {
         updatedFilters.page = 1;
       }
@@ -62,11 +56,13 @@ export default function ProductsClientWrapper({ products, total }) {
       return updatedFilters;
     });
   };
+
   // Dedicated handler for pagination clicks
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
+  // Push filter state updates to URL (debounced)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       const params = new URLSearchParams();
@@ -74,14 +70,10 @@ export default function ProductsClientWrapper({ products, total }) {
       if (filters.searchQuery) params.set("searchQuery", filters.searchQuery);
       if (filters.category !== "All") params.set("category", filters.category);
       if (filters.sort !== "latest") params.set("sort", filters.sort);
-      if (filters.page > 1) params.set("page", filters.page.toString()); // Only add page if > 1
+      if (filters.page > 1) params.set("page", filters.page.toString());
 
-      const newUrl = params.toString()
-        ? `${pathname}?${params.toString()}`
-        : pathname;
-      const currentUrl = searchParams.toString()
-        ? `${pathname}?${searchParams.toString()}`
-        : pathname;
+      const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+      const currentUrl = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
 
       if (newUrl !== currentUrl) {
         router.replace(newUrl, { scroll: false });
@@ -93,14 +85,15 @@ export default function ProductsClientWrapper({ products, total }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-12">
-      {/* Renders your marketplace search and filter inputs */}
+      {/* Search and filter inputs */}
       <ProductFilterBar filters={filters} onFilterChange={handleFilterChange} />
 
-      {products?.length > 0 ? (
+      {/* ✅ Fixed Array Check */}
+      {Array.isArray(products) && products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard key={product._id || product.id} product={product} />
             ))}
           </div>
 
@@ -116,8 +109,7 @@ export default function ProductsClientWrapper({ products, total }) {
         <div className="flex flex-col items-center justify-center py-20 mt-6 text-center border border-dashed border-zinc-800 rounded-2xl">
           <p className="text-lg font-medium text-white mb-1">No items found</p>
           <p className="text-sm text-zinc-400">
-            Try adjusting your filters or search query to find the item you are
-            looking for.
+            Try adjusting your filters or search query to find the item you are looking for.
           </p>
         </div>
       )}

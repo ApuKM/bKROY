@@ -20,13 +20,13 @@ export default async function FeaturedPage() {
           </p>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredProducts?.map((product) => (
+          {Array.isArray(featuredProducts) && featuredProducts?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex justify-end">
           <Link href="/products">
-            <button className="rounded-xl border border-zinc-700 px-6 py-3 transition hover:border-[#0A7C6E] hover:text-[#0A7C6E]">
+            <button className="rounded-xl border border-zinc-700 px-3 py-1.5 transition hover:border-[#0A7C6E] hover:text-[#0A7C6E]">
               View All Products
             </button>
           </Link>
