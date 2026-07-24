@@ -1,10 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { getFeaturedProducts } from "@/lib/api/products";
 import ProductCard from "../products/ProductCard";
 import Link from "next/link";
 
 export default async function FeaturedPage() {
   const featuredProducts = await getFeaturedProducts();
-
+  console.log("featured", featuredProducts)
   return (
     <div className="border-y border-zinc-800 bg-linear-to-b from-black to-zinc-950 py-16 text-white">
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 ">

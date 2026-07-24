@@ -45,5 +45,7 @@ async function AsyncProductsList({ searchParams }) {
     limit,
   });
 
+  console.log("products", products)
+
   return <ProductsClientWrapper products={products} total={total} />;
 }

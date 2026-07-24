@@ -1,11 +1,13 @@
 import { Skeleton } from "@heroui/react";
 
+
 export default function ProductsSkeleton() {
 
   const skeletonCards = Array.from({ length: 12 });
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="max-w-7xl mx-auto py-16">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {skeletonCards.map((_, index) => (
         <div 
           key={index} 
@@ -40,6 +42,7 @@ export default function ProductsSkeleton() {
           </div>
         </div>
       ))}
+    </div>
     </div>
   );
 }
