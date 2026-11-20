@@ -7,6 +7,7 @@ const normalizeBuyerId = (value) => {
 };
 
 export const getPaymentsOfBuyer = async (buyerId) => {
+  'use cache'
   const normalizedBuyerId = normalizeBuyerId(buyerId);
 
   if (!normalizedBuyerId) return [];

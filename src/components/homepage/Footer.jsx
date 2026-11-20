@@ -1,32 +1,21 @@
-'use client';
+'use cache';
 
 import React from 'react';
 import Link from 'next/link';
 import { Button, Separator } from '@heroui/react';
-import { 
-  MapPinCheck, 
-  PhoneCall, 
-  MailIcon, 
-} from 'lucide-react';
+import { MapPinCheck, PhoneCall, MailIcon } from 'lucide-react';
+import { BsFacebook, BsTwitter, BsInstagram, BsLinkedin } from 'react-icons/bs';
 
-import { BsFacebook,BsTwitter, BsInstagram, BsLinkedin } from 'react-icons/bs';
-
-
-export default function Footer() {
-  // Current year for the copyright section
+export default async function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    // Dark background to match the Navbar's blackish theme
-    <footer className="bg-[#0f0f10] text-gray-200  border-t border-white/10 pt-16 pb-8">
+    <footer className="bg-[#0f0f10] text-gray-200 border-t border-white/10 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        
         {/* Top Section: Grid for Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          
           {/* 1. Brand Information */}
           <div className="flex flex-col gap-4">
-            {/* Reused Logo from Navbar */}
             <div className="flex gap-2 items-center text-white">
               <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-[#0A7C6E] font-bold text-3xl text-white">
                 B
@@ -53,14 +42,13 @@ export default function Footer() {
                 <Link href="/" className="hover:text-[#0A7C6E] transition-colors">Home</Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-[#0A7C6E]
-                transition-colors">Products</Link>
+                <Link href="/products" className="hover:text-[#0A7C6E] transition-colors">Products</Link>
               </li>
               <li>
                 <Link href="/categories" className="hover:text-[#0A7C6E] transition-colors">Categories</Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-[#0A7C6E]transition-colors">Dashboard</Link>
+                <Link href="/dashboard" className="hover:text-[#0A7C6E] transition-colors">Dashboard</Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-[#0A7C6E] transition-colors">About Us</Link>
@@ -84,7 +72,7 @@ export default function Footer() {
                 <MailIcon size={18} className="text-[#0A7C6E] shrink-0" />
                 <span>support@bkroy.com</span>
               </li>
-</ul>
+            </ul>
           </div>
 
           {/* 4. Social Media Links */}
@@ -108,10 +96,8 @@ export default function Footer() {
               </Button>
             </div>
           </div>
-          
         </div>
 
-        {/* Hero UI Divider for visual separation */}
         <Separator className="bg-white/10 my-8" />
 
         {/* 5. Copyright Section */}
@@ -122,7 +108,6 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
-        
       </div>
     </footer>
   );
