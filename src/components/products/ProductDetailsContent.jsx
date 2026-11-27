@@ -13,6 +13,9 @@ import {
   FiMail,
   FiShoppingCart,
 } from "react-icons/fi";
+import WishlistButton from "./WishListButton";
+import { getUserSession } from "@/lib/core/session";
+import { getWishListOfBuyer } from "@/lib/api/orders";
 
 // --- Helper Functions ---
 const formatDate = (dateString) => {
@@ -25,7 +28,11 @@ const formatDate = (dateString) => {
 
 export default async function ProductDetailsContent({ paramsPromise }) {
   const { id } = await paramsPromise;
-  const product = await getProductById(id);
+
+  const [product, user] = await Promise.all([
+    getProductById(id),
+    getUserSession(),
+  ]);
 
   if (!product) {
     return (
@@ -33,6 +40,19 @@ export default async function ProductDetailsContent({ paramsPromise }) {
         Product not found.
       </div>
     );
+  }
+
+  //Check if the product is in the wishlist
+  let initialIsSaved = false;
+  if (user?.id) {
+    try {
+      const userWishlist = await getWishListOfBuyer(user.id);
+      initialIsSaved = userWishlist.some(
+        (item) => item.productId === id || item._id === id,
+      );
+    } catch (error) {
+      console.error("Failed to fetch wishlist status:", error);
+    }
   }
 
   const isAvailable =
@@ -165,6 +185,14 @@ export default async function ProductDetailsContent({ paramsPromise }) {
                   Out of Stock
                 </button>
               )}
+
+              <div className="mt-3">
+                <WishlistButton
+                  productId={product?._id}
+                  userId={user?.id}
+                  initialIsSaved={initialIsSaved}
+                />
+              </div>
 
               <p className="mt-4 text-center text-xs text-zinc-500">
                 Secure transaction via bKroy guarantees.
