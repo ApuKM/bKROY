@@ -29,7 +29,7 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
-    const redirectTo = searchParams.get("redirect") || "/dashboard";
+    const redirectTo = searchParams.get("redirect") || "";
     try {
       const { data: authData, error: authError } =
         await authClient.signIn.email({

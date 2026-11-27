@@ -20,7 +20,7 @@ export default function RegisterPage() {
         <Suspense
           fallback={
             <div className="skeleton--shimmer relative  max-w-md overflow-hidden rounded-xl">
-              <Skeleton animationType="none" className="h-100 rounded-xl" />
+              <Skeleton animationType="shimmer" className="h-100 rounded-xl" />
             </div>
           }
         >

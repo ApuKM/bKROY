@@ -27,8 +27,6 @@ const RegisterForm = () => {
     role: "buyer",
   });
   const router = useRouter();
-  // console.log(formData)
-  // Processing & UI States
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

@@ -18,22 +18,28 @@ export const AuthHeader = async () => {
 };
 
 const HandleStatusCode = (res) => {
-  if(res.status === 401){
-    redirect("/unauthorized")
+  if (res.status === 401) {
+    redirect("/unauthorized");
+  } else if (res.status === 403) {
+    redirect("/forbidden");
   }
-  else if(res.status === 403){
-    redirect("/forbidden")
-  }
-  return res.json()
-}
+  return res.json();
+};
 
 export const serverFetch = async (path) => {
-  const res = await fetch(`${baseUrl}${path}`);
+  const headers = await AuthHeader();
 
-  // if (!res.ok) {
-  //   throw new Error(`API error: ${res.status}`);
-  // }
-  return res.json();
+  const res = await fetch(`${baseUrl}${path}`, {
+    headers: {
+      ...headers,
+      "Content-Type": "application/json",
+    },
+  });
+
+  // console.log("res from serverFetch:", res);
+
+  // 3. Use existing handler to catch 401/403 redirects, or return JSON
+  return HandleStatusCode(res);
 };
 
 export const serverMutation = async (path, data = null, method = "POST") => {
@@ -53,5 +59,5 @@ export const serverMutation = async (path, data = null, method = "POST") => {
     throw new Error(`API error: ${res.status}`);
   }
 
-   return HandleStatusCode(res);;
+  return HandleStatusCode(res);
 };

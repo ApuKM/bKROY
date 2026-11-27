@@ -5,16 +5,15 @@ import { getProductById } from "@/lib/api/products";
 
 export default async function BuyerOrdersPage() {
   const user = await getUserSession();
+  console.log("userid", user.id)
   
   let orders = [];
 
   // 1. Only fetch if we actually have a logged-in user
   if (user?.id) {
     try {
-      const response = await getOrdersOfBuyer(user.id);
-      
-      // 2. CRITICAL: Safely verify that the response is actually an array
-      orders = Array.isArray(response) ? response : [];
+      orders = await getOrdersOfBuyer(user.id);
+      console.log("Orders", orders)
     } catch (error) {
       console.error("Failed to fetch buyer orders:", error);
       orders = []; // Fallback to empty array on network failure
@@ -26,6 +25,7 @@ export default async function BuyerOrdersPage() {
     orders.map(async (order) => {
       try {
         const product = await getProductById(order.productId);
+        console.log("Prodcuts", product)
         return {
           ...order,
           product,

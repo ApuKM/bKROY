@@ -10,7 +10,7 @@ import { deleteAnOrder } from "@/lib/actions/orders";
 
 export default function OrderListClient({ initialOrders }) {
   const [orders, setOrders] = useState(initialOrders);
-  console.log(orders);
+  console.log("orders from orderlist page", orders);
   // Helper function to style status badges dynamically based on your new DB statuses
   const getStatusStyles = (status) => {
     const normalizedStatus = status?.toLowerCase();
@@ -45,9 +45,9 @@ export default function OrderListClient({ initialOrders }) {
           // Fallbacks for missing product data in the current schema
           // (Ideally, populate these fields from the database)
           const productName =
-            item.product?.name || `Product ID: ${item.productId}`;
+            item.product?.title || `Product ID: ${item.productId}`;
           const productPrice = item.product?.price || "N/A";
-          const productImage = item.product?.images?.[0];
+          const productImage = item.product?.image?.[0];
           const orderDate = item.createdAt
             ? new Date(item.createdAt).toLocaleDateString()
             : "Unknown Date";
