@@ -5,7 +5,6 @@ import { getProductById } from "@/lib/api/products";
 
 export default async function BuyerOrdersPage() {
   const user = await getUserSession();
-  console.log("userid", user.id)
   
   let orders = [];
 
@@ -13,7 +12,6 @@ export default async function BuyerOrdersPage() {
   if (user?.id) {
     try {
       orders = await getOrdersOfBuyer(user.id);
-      console.log("Orders", orders)
     } catch (error) {
       console.error("Failed to fetch buyer orders:", error);
       orders = []; // Fallback to empty array on network failure
@@ -25,7 +23,6 @@ export default async function BuyerOrdersPage() {
     orders.map(async (order) => {
       try {
         const product = await getProductById(order.productId);
-        console.log("Prodcuts", product)
         return {
           ...order,
           product,
@@ -40,7 +37,7 @@ export default async function BuyerOrdersPage() {
   );
 
   return (
-    <div className="mx-auto max-w-5xl py-8">
+    <div className="mx-auto max-w-5xl py-0">
       <h1 className="mb-6 text-2xl font-bold text-white px-6">My Orders</h1>
 
       {ordersWithProducts && ordersWithProducts.length > 0 ? (
