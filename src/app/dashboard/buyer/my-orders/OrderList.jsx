@@ -10,7 +10,7 @@ import { deleteAnOrder } from "@/lib/actions/orders";
 
 export default function OrderListClient({ initialOrders }) {
   const [orders, setOrders] = useState(initialOrders);
-  console.log("orders from orderlist page", orders);
+  // console.log("orders from orderlist page", orders);
   // Helper function to style status badges dynamically based on your new DB statuses
   const getStatusStyles = (status) => {
     const normalizedStatus = status?.toLowerCase();

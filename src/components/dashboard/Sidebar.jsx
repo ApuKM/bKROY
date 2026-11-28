@@ -1,3 +1,8 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+
 import {
   PersonPencil,
   CreditCard,
@@ -7,16 +12,14 @@ import {
   Briefcase,
   PencilToLine,
 } from "@gravity-ui/icons";
+
 import { Button, Drawer } from "@heroui/react";
-import Link from "next/link";
 import { MdBorderColor } from "react-icons/md";
 import { SiWish } from "react-icons/si";
 import { BadgeCent } from "lucide-react";
-import { getUserSession } from "@/lib/core/session";
 
-export async function Sidebar() {
-  const user = await getUserSession();
-
+// Navigation configuration
+function getNavItems(role, userId) {
   const buyerNavItems = [
     {
       icon: MdBorderColor,
@@ -30,7 +33,7 @@ export async function Sidebar() {
     },
     {
       icon: BadgeCent,
-      href: `/dashboard/buyer/${user?.id}/payment-history`,
+      href: `/dashboard/buyer/payment-history`,
       label: "Payment History",
     },
     {
@@ -38,7 +41,6 @@ export async function Sidebar() {
       href: "/dashboard/seeker/profile",
       label: "Profile Management",
     },
-
     {
       icon: Gear,
       href: "/dashboard/buyer/settings",
@@ -47,7 +49,11 @@ export async function Sidebar() {
   ];
 
   const sellerNavItems = [
-    { icon: Plus, href: "/dashboard/seller/add-product", label: "Add Product" },
+    {
+      icon: Plus,
+      href: "/dashboard/seller/add-product",
+      label: "Add Product",
+    },
     {
       icon: Briefcase,
       href: "/dashboard/seller/my-products",
@@ -58,60 +64,106 @@ export async function Sidebar() {
       href: "/dashboard/seller/manage-orders",
       label: "Manage Orders",
     },
-    { icon: PersonPencil, href: "/dashboard/seller", label: "Profile" },
+    {
+      icon: PersonPencil,
+      href: "/dashboard/seller",
+      label: "Profile",
+      exact: true,
+    },
     {
       icon: CreditCard,
       href: "/dashboard/buyer/billing",
       label: "Billing",
     },
-    { icon: Gear, href: "/dashboard/seller/settings", label: "Settings" },
+    {
+      icon: Gear,
+      href: "/dashboard/seller/settings",
+      label: "Settings",
+    },
   ];
 
-  const navLinksMap = {
-    buyer: buyerNavItems,
-    seller: sellerNavItems,
+  return role === "seller"
+    ? sellerNavItems
+    : buyerNavItems;
+}
+
+export function Sidebar({ role, userId }) {
+  const pathname = usePathname();
+
+  const navItems = getNavItems(role, userId);
+
+  // Check active route
+  const isActive = (item) => {
+    if (item.exact) {
+      return pathname === item.href;
+    }
+
+    return (
+      pathname === item.href ||
+      pathname.startsWith(`${item.href}/`)
+    );
   };
 
-  const roleKey = user?.role === "seller" ? "seller" : "buyer";
-  const navItems = navLinksMap[roleKey];
-
   const navContent = (
-    <nav className="flex flex-col gap-1 ">
-      {navItems.map((item) => (
-        <Link href={item.href} key={item.label}>
-          <button
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all w-full text-zinc-300 hover:bg-zinc-800 cursor-pointer"
-            type="button"
+    <nav className="flex flex-col gap-1">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = isActive(item);
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-current={active ? "page" : undefined}
+            className={`
+              flex items-center gap-3 rounded-xl
+              px-3 py-2.5 text-sm transition-all
+              w-full
+              ${
+                active
+                  ? "text-[#0A7C6E] font-semibold"
+                  : "text-zinc-300 hover:bg-zinc-800"
+              }
+            `}
           >
-            {/* 3. The icon renders normally with the updated type */}
-            <item.icon className="size-5 text-zinc-300" />
+            <Icon className="size-5" />
             {item.label}
-          </button>
-        </Link>
-      ))}
+          </Link>
+        );
+      })}
     </nav>
   );
 
   return (
     <>
-      <div className="hidden lg:border-r border-zinc-800 lg:block lg:h-full">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block lg:h-full lg:border-r border-zinc-800">
         {navContent}
       </div>
+
+      {/* Mobile Sidebar */}
       <Drawer>
         <Button
-          className={"lg:hidden bg-zinc-800 text-zinc-300"}
+          className="lg:hidden bg-zinc-800 text-zinc-300"
           variant="tertiary"
         >
           <Bars />
         </Button>
+
         <Drawer.Backdrop variant="blur">
           <Drawer.Content placement="left">
             <Drawer.Dialog className="bg-black/80">
               <Drawer.CloseTrigger />
+
               <Drawer.Header>
-                <Drawer.Heading>Navigation</Drawer.Heading>
+                <Drawer.Heading>
+                  Navigation
+                </Drawer.Heading>
               </Drawer.Header>
-              <Drawer.Body>{navContent}</Drawer.Body>
+
+              <Drawer.Body>
+                {navContent}
+              </Drawer.Body>
             </Drawer.Dialog>
           </Drawer.Content>
         </Drawer.Backdrop>
